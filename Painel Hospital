@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Center Cortez - Painel macOS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- Variáveis de Tema (Estilo macOS) --- */
+        :root {
+            --desktop-bg: #c9e4d6;
+            --desktop-mesh: radial-gradient(at 80% 0%, hsla(152,70%,74%,0.8) 0px, transparent 50%),
+                          radial-gradient(at 0% 50%, hsla(188,70%,76%,0.8) 0px, transparent 50%),
+                          radial-gradient(at 80% 100%, hsla(139,70%,70%,0.8) 0px, transparent 50%),
+                          radial-gradient(at 0% 0%, hsla(208,70%,73%,0.8) 0px, transparent 50%);
+            
+            --bg-window: rgba(255, 255, 255, 0.85);
+            --bg-sidebar: rgba(240, 244, 242, 0.5);
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --border-window: rgba(255, 255, 255, 0.6);
+            --border-element: rgba(0, 0, 0, 0.1);
+            
+            --text-main: #1d1d1f;
+            --text-muted: #86868b;
+            --text-sidebar: #1d1d1f;
+            --sidebar-active-bg: rgba(0, 0, 0, 0.08);
+            
+            --apple-green: #34c759;
+            --apple-green-hover: #2db34f;
+            --apple-red: #ff3b30;
+            --step-inactive: #d2d2d7;
+            --overlay: rgba(0, 0, 0, 0.3);
+            --focus-ring: rgba(52, 199, 89, 0.3);
+            --shadow-card: 0 4px 15px rgba(0, 0, 0, 0.04);
+        }
+
+        [data-theme="dark"] {
+            --desktop-bg: #0d1a14;
+            --desktop-mesh: radial-gradient(at 80% 0%, hsla(152,60%,15%,1) 0px, transparent 50%),
+                          radial-gradient(at 0% 50%, hsla(188,60%,10%,1) 0px, transparent 50%),
+                          radial-gradient(at 80% 100%, hsla(139,60%,12%,1) 0px, transparent 50%),
+                          radial-gradient(at 0% 0%, hsla(208,60%,10%,1) 0px, transparent 50%);
+                          
+            --bg-window: rgba(30, 30, 32, 0.85);
+            --bg-sidebar: rgba(40, 40, 44, 0.5);
+            --bg-card: rgba(44, 44, 46, 0.9);
+            --border-window: rgba(255, 255, 255, 0.1);
+            --border-element: rgba(255, 255, 255, 0.15);
+            
+            /* Correção de Legibilidade no Modo Escuro */
+            --text-main: #ffffff; 
+            --text-muted: #a1a1a6; /* Cinza mais claro para maior contraste */
+            --text-sidebar: #f5f5f7;
+            --sidebar-active-bg: rgba(255, 255, 255, 0.1);
+            
+            --apple-green: #30d158;
+            --apple-green-hover: #2bc150;
+            --step-inactive: #48484a;
+            --overlay: rgba(0, 0, 0, 0.6);
+            --shadow-card: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        
+        body { 
+            display: flex; justify-content: center; align-items: center; min-height: 100vh; 
+            background-color: var(--desktop-bg); background-image: var(--desktop-mesh);
+            padding: 30px; transition: all 0.4s ease; overflow: hidden;
+            color: var(--text-main);
+        }
+
+        .app-window {
+            display: flex; width: 100%; max-width: 1400px; height: 90vh;
+            background: var(--bg-window); border: 1px solid var(--border-window);
+            border-radius: 12px; box-shadow: 0 25px 50px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.1) inset;
+            overflow: hidden; backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+        }
+
+        /* --- Barra Lateral --- */
+        .sidebar { width: 260px; background: var(--bg-sidebar); border-right: 1px solid var(--border-element); display: flex; flex-direction: column; padding: 20px 15px; }
+        .mac-controls { display: flex; gap: 8px; margin-bottom: 30px; padding-left: 5px; }
+        .mac-btn { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .mac-close { background: #ff5f56; border: 1px solid #e0443e; }
+        .mac-min { background: #ffbd2e; border: 1px solid #dea123; }
+        .mac-max { background: #27c93f; border: 1px solid #1aab29; }
+
+        .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 25px; padding-left: 5px; color: var(--text-sidebar); }
+        .brand h2 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.3px; }
+
+        .nav-menu { list-style: none; flex-grow: 1; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 6px; cursor: pointer; margin-bottom: 4px; transition: 0.2s; font-size: 0.95rem; font-weight: 500; color: var(--text-sidebar); }
+        .nav-item i { width: 20px; text-align: center; color: var(--apple-green); }
+        .nav-item:hover { background-color: rgba(0,0,0,0.04); }
+        [data-theme="dark"] .nav-item:hover { background-color: rgba(255,255,255,0.05); }
+        .nav-item.active { background-color: var(--sidebar-active-bg); font-weight: 600; }
+
+        .sidebar-footer { margin-top: auto; display: flex; flex-direction: column; gap: 15px; }
+        .theme-switch { border: 1px solid var(--border-element); background: var(--bg-card); color: var(--text-sidebar); padding: 8px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.9rem; transition: 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .theme-switch:hover { background: var(--sidebar-active-bg); }
+        
+        .user-profile { display: flex; align-items: center; gap: 10px; padding: 10px; background: transparent; border-radius: 8px; }
+        .user-profile img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-element); }
+        .user-info h4 { font-size: 0.9rem; margin-bottom: 2px; color: var(--text-sidebar); }
+        .status-badge { font-size: 0.7rem; color: var(--apple-green); display: flex; align-items: center; gap: 4px; font-weight: 500; }
+
+        /* --- Conteúdo Principal --- */
+        .main { flex-grow: 1; padding: 40px 50px; overflow-y: auto; color: var(--text-main); }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
+        .page-header h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }
+        
+        .header-actions { display: flex; gap: 10px; }
+        .btn-action { background-color: var(--apple-green); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 0.95rem; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .btn-action:hover:not(:disabled) { background-color: var(--apple-green-hover); }
+        .btn-action:disabled { background-color: var(--step-inactive); cursor: not-allowed; opacity: 0.6; box-shadow: none; color: rgba(255,255,255,0.6); }
+        .btn-secondary { background-color: transparent; border: 1px solid var(--border-element); color: var(--text-main); box-shadow: none; }
+        .btn-secondary:hover { background-color: var(--sidebar-active-bg); }
+
+        .content-section { display: none; animation: fadeIn 0.4s ease; }
+        .content-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Cards da Home (Visão Geral) --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .mac-card { background: var(--bg-card); padding: 25px; border-radius: 12px; border: 1px solid var(--border-element); box-shadow: var(--shadow-card); display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s; }
+        .mac-card:hover { transform: translateY(-2px); }
+        .mac-card-header { display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); margin-bottom: 15px; font-size: 0.95rem; font-weight: 500; }
+        .mac-card-metric { font-size: 2.2rem; font-weight: 700; color: var(--text-main); margin-bottom: 5px; }
+        .mac-card-trend { font-size: 0.85rem; color: var(--apple-green); font-weight: 500; display: flex; align-items: center; gap: 5px; }
+        
+        .welcome-banner { background: linear-gradient(135deg, rgba(52, 199, 89, 0.1), rgba(0,0,0,0)); border: 1px solid var(--border-element); padding: 30px; border-radius: 12px; margin-bottom: 30px; }
+        .welcome-banner h2 { font-size: 1.5rem; margin-bottom: 8px; color: var(--text-main); }
+        .welcome-banner p { color: var(--text-muted); font-size: 1rem; }
+
+        /* --- Formulários --- */
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.85rem; color: var(--text-main); opacity: 0.9; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid var(--border-element); border-radius: 8px; background: var(--bg-card); color: var(--text-main); transition: 0.2s; font-size: 0.95rem; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02); }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--apple-green); outline: none; box-shadow: 0 0 0 3px var(--focus-ring); }
+
+        /* --- STEPPER (Joguinho de Contratação) --- */
+        .stepper-card { background: var(--bg-card); border-radius: 12px; padding: 35px; box-shadow: var(--shadow-card), 0 0 0 1px var(--border-element); max-width: 650px; margin: 0 auto; }
+        .progress-container { display: flex; justify-content: space-between; position: relative; margin-bottom: 35px; padding: 0 20px; }
+        .progress-container::before { content: ''; background: var(--border-element); position: absolute; top: 50%; left: 0; transform: translateY(-50%); height: 3px; width: 100%; z-index: 1; border-radius: 2px; }
+        .progress-line { background: var(--apple-green); position: absolute; top: 50%; left: 0; transform: translateY(-50%); height: 3px; width: 0%; z-index: 2; transition: width 0.4s ease; border-radius: 2px; }
+        .step-circle { height: 32px; width: 32px; background: var(--bg-card); border: 3px solid var(--border-element); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.9rem; color: var(--text-muted); z-index: 3; transition: 0.4s ease; box-shadow: 0 0 0 4px var(--bg-card); }
+        .step-circle.active { border-color: var(--apple-green); color: var(--apple-green); }
+        .step-circle.completed { background: var(--apple-green); border-color: var(--apple-green); color: white; }
+        .form-step { display: none; animation: fadeIn 0.3s ease; }
+        .form-step.active { display: block; }
+        .form-step h3 { margin-bottom: 25px; text-align: center; color: var(--text-main); font-size: 1.3rem; font-weight: 600; }
+        .step-actions { display: flex; justify-content: space-between; gap: 12px; margin-top: 30px; }
+        .step-actions button { flex: 1; }
+        
+        .aviso-laranja { background-color: rgba(255, 149, 0, 0.1); border-radius: 8px; padding: 15px; margin-bottom: 20px; font-size: 0.9rem; color: var(--text-main); border: 1px solid rgba(255, 149, 0, 0.2); }
+        .codigo-hospital { font-family: "SF Mono", "Courier New", monospace; font-size: 1.3rem; text-align: center; letter-spacing: 3px; color: var(--text-main); }
+
+        .success-screen { text-align: center; padding: 30px 0; }
+        .success-screen i { font-size: 4.5rem; color: var(--apple-green); margin-bottom: 15px; }
+        .success-screen h2 { margin-bottom: 10px; font-size: 1.5rem; color: var(--text-main); }
+        .success-screen p { color: var(--text-muted); font-size: 1rem; line-height: 1.5; margin-bottom: 25px; }
+        .success-link { color: var(--apple-green); text-decoration: none; font-weight: 500; cursor: pointer; }
+        .success-link:hover { text-decoration: underline; }
+
+        /* --- Modais --- */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--overlay); z-index: 1000; justify-content: center; align-items: flex-start; padding-top: 5vh; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+        .modal-body { background: var(--bg-window); color: var(--text-main); border: 1px solid var(--border-window); box-shadow: 0 25px 50px rgba(0,0,0,0.3); padding: 30px; border-radius: 12px; width: 500px; max-height: 85vh; overflow-y: auto; position: relative; animation: slideDown 0.3s ease; }
+        .modal-body h2 { color: var(--text-main); }
+        .modal-body p { color: var(--text-muted); }
+        @keyframes slideDown { from { transform: translateY(-20px) scale(0.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+        
+        /* Botão de Fechar do Modal (Estilo Mac Vermelho) */
+        .modal-close { 
+            position: absolute; 
+            top: 18px; 
+            right: 18px; 
+            width: 14px; 
+            height: 14px; 
+            background: #ff5f56; 
+            border: 1px solid #e0443e; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            transition: transform 0.2s, filter 0.2s; 
+        }
+        .modal-close:hover { 
+            transform: scale(1.1); 
+            filter: brightness(0.9);
+        }
+
+        .form-builder { background: rgba(0,0,0,0.02); border: 1px dashed var(--border-element); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        [data-theme="dark"] .form-builder { background: rgba(255,255,255,0.02); }
+        .questions-list { display: flex; flex-direction: column; gap: 8px; }
+        .question-item { background: var(--bg-card); padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border-element); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .question-info strong { display: block; margin-bottom: 2px; font-size: 0.95rem; color: var(--text-main); }
+        .question-info small { color: var(--text-muted); font-size: 0.8rem; }
+        .btn-delete { background: transparent; border: none; color: var(--apple-red); cursor: pointer; padding: 5px; opacity: 0.7; transition: 0.2s; }
+        .btn-delete:hover { opacity: 1; transform: scale(1.1); }
+
+        /* --- Quadro de Funcionários --- */
+        .employees-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-element);
+            box-shadow: var(--shadow-card);
+            margin-top: 24px;
+            overflow: hidden;
+        }
+        .employees-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-element);
+        }
+        .employees-header h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        .employees-table-wrapper { overflow-x: auto; }
+        .employees-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+        .employees-table th,
+        .employees-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-element);
+            text-align: left;
+            font-size: 0.92rem;
+            color: var(--text-main);
+        }
+        .employees-table th {
+            font-size: 0.82rem;
+            letter-spacing: 0.3px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        .employees-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .id-text {
+            font-family: "SF Mono", "Courier New", monospace;
+            font-size: 0.83rem;
+            color: var(--text-muted);
+        }
+        .emp-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            border: 1px solid transparent;
+        }
+        .emp-badge.on {
+            color: #166534;
+            background: rgba(52, 199, 89, 0.14);
+            border-color: rgba(52, 199, 89, 0.35);
+        }
+        .emp-badge.off {
+            color: #9a3412;
+            background: rgba(255, 149, 0, 0.14);
+            border-color: rgba(255, 149, 0, 0.35);
+        }
+        .action-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 7px;
+            border: 1px solid var(--border-element);
+            background: transparent;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-icon:hover {
+            background: var(--sidebar-active-bg);
+            transform: translateY(-1px);
+        }
+        .btn-icon.danger {
+            color: var(--apple-red);
+            border-color: rgba(255, 59, 48, 0.35);
+        }
+        .btn-icon.danger:hover {
+            background: rgba(255, 59, 48, 0.08);
+        }
+        .cargo-select {
+            min-width: 210px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-element);
+            background: var(--bg-card);
+            color: var(--text-main);
+            font-size: 0.86rem;
+            cursor: pointer;
+        }
+        .cargo-select:focus {
+            outline: none;
+            border-color: var(--apple-green);
+            box-shadow: 0 0 0 3px var(--focus-ring);
+        }
+        .employee-sheet {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 16px;
+            margin-bottom: 16px;
+        }
+        .employee-sheet-item {
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border-element);
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+        [data-theme="dark"] .employee-sheet-item {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .employee-sheet-item strong {
+            display: block;
+            font-size: 0.76rem;
+            letter-spacing: 0.2px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+        .employee-sheet-item span {
+            font-size: 0.93rem;
+            color: var(--text-main);
+        }
+        .multa-box {
+            display: none;
+            border: 1px solid var(--border-element);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 14px;
+            background: rgba(255, 149, 0, 0.08);
+        }
+        .multa-box.show { display: block; }
+        .radio-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 0.92rem;
+            color: var(--text-main);
+        }
+        .radio-line:last-child { margin-bottom: 0; }
+        .radio-group-inline {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: nowrap;
+        }
+        .radio-group-inline .radio-line {
+            margin-bottom: 0;
+        }
+        .radio-group-inline .radio-line label {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-window">
+        
+        <aside class="sidebar">
+            <div class="mac-controls">
+                <div class="mac-btn mac-close"></div>
+                <div class="mac-btn mac-min"></div>
+                <div class="mac-btn mac-max"></div>
+            </div>
+
+            <div class="brand">
+                <i class="fa-solid fa-house-medical"></i>
+                <h2>MC Cortez</h2>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item active" onclick="showTab('home')">
+                    <i class="fa-solid fa-house"></i> Visão Geral
+                </li>
+                <li class="nav-item" onclick="showTab('mural')">
+                    <i class="fa-solid fa-message"></i> Mural de Avisos
+                </li>
+                <li class="nav-item" onclick="showTab('contratacao')">
+                    <i class="fa-solid fa-file-signature"></i> Contratação
+                </li>
+                <li class="nav-item" onclick="showTab('funcionarios')">
+                    <i class="fa-solid fa-id-badge"></i> Funcionários
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <button class="theme-switch" onclick="toggleTheme()" id="themeBtn">
+                    <i class="fa-solid fa-moon"></i> Aspecto Escuro
+                </button>
+                <div class="user-profile">
+                    <img src="https://ui-avatars.com/api/?name=Dr+Cortez&background=e5e5ea&color=1d1d1f" alt="Foto">
+                    <div class="user-info">
+                        <h4>Dr. Cortez</h4>
+                        <span class="status-badge"><i class="fa-solid fa-circle"></i> Disponível</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main">
+            
+            <section id="home" class="content-section active">
+                <div class="page-header">
+                    <h1>Visão Geral</h1>
+                </div>
+
+                <div class="welcome-banner">
+                    <h2>Olá, Dr. Cortez</h2>
+                    <p>Eis o resumo das atividades do Medical Center hoje.</p>
+                </div>
+
+                <div class="grid">
+                    <div class="mac-card">
+                        <div class="mac-card-header">
+                            <span>Pacientes Internados</span>
+                            <i class="fa-solid fa-bed-pulse"></i>
+                        </div>
+                        <div class="mac-card-metric">142</div>
+                        <div class="mac-card-trend"><i class="fa-solid fa-arrow-trend-up"></i> +5% esta semana</div>
+                    </div>
+
+                    <div class="mac-card">
+                        <div class="mac-card-header">
+                            <span>Processos de RH (Ativos)</span>
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div class="mac-card-metric">8</div>
+                        <div class="mac-card-trend" style="color: var(--text-muted)"><i class="fa-solid fa-minus"></i> Sem alterações</div>
+                    </div>
+
+                    <div class="mac-card">
+                        <div class="mac-card-header">
+                            <span>Taxa de Ocupação (UTI)</span>
+                            <i class="fa-solid fa-heart-pulse"></i>
+                        </div>
+                        <div class="mac-card-metric">85%</div>
+                        <div class="mac-card-trend" style="color: var(--apple-red)"><i class="fa-solid fa-arrow-trend-up"></i> Lotação próxima</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="mural" class="content-section">
+                <div class="page-header">
+                    <h1>Mural de Avisos</h1>
+                    <div class="header-actions">
+                        <button class="btn-action" onclick="toggleModal('modal-novo-aviso', true)">
+                            <i class="fa-solid fa-plus"></i> Novo Aviso
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid" id="mural-grid">
+                    <div class="mac-card">
+                        <div class="mac-card-header">
+                            <span style="color: var(--apple-red); font-weight: 600;"><i class="fa-solid fa-circle-exclamation"></i> Urgente</span>
+                            <small>Hoje, 08:30</small>
+                        </div>
+                        <h3 style="margin-bottom: 10px; font-size: 1.15rem;">Manutenção no Tomógrafo</h3>
+                        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">O equipamento da Ala Leste estará inoperante das 14h às 16h para manutenção preventiva programada.</p>
+                    </div>
+
+                    <div class="mac-card">
+                        <div class="mac-card-header">
+                            <span style="color: var(--apple-green); font-weight: 600;"><i class="fa-solid fa-circle-info"></i> Informativo</span>
+                            <small>Ontem, 14:00</small>
+                        </div>
+                        <h3 style="margin-bottom: 10px; font-size: 1.15rem;">Reunião Corpo Clínico</h3>
+                        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">Reunião geral na próxima sexta-feira no auditório principal para revisão das novas diretrizes de triagem.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="contratacao" class="content-section">
+                
+                <div class="page-header">
+                    <h1>Recursos Humanos</h1>
+                    <div class="header-actions">
+                        <button class="btn-action btn-secondary" onclick="toggleModal('modal-config-form', true)">
+                            <i class="fa-solid fa-slider"></i> Configurar Vaga
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stepper-card">
+                    <div class="progress-container" id="progress-container">
+                        <div class="progress-line" id="progress-line"></div>
+                        <div class="step-circle active" id="circle-1">1</div>
+                        <div class="step-circle" id="circle-2">2</div>
+                        <div class="step-circle" id="circle-3">3</div>
+                    </div>
+
+                    <div id="step-1" class="form-step active">
+                        <h3>A Entrevista</h3>
+                        <div class="form-group">
+                            <label>Experiência Profissional *</label>
+                            <textarea id="h-experiencia" rows="3" placeholder="Histórico do candidato..." oninput="validateStep1()"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Motivo da Contratação</label>
+                            <input type="text" id="h-motivo" placeholder="Por que o Cortez?">
+                        </div>
+                        <div class="form-group">
+                            <label>Disponibilidade de Plantões *</label>
+                            <select id="h-disponibilidade" onchange="validateStep1()">
+                                <option value="">Selecionar opção...</option>
+                                <option value="sim">Pode realizar plantões</option>
+                                <option value="nao">Sem disponibilidade de plantão</option>
+                            </select>
+                        </div>
+
+                        <div id="campos-dinamicos-stepper"></div>
+
+                        <div class="step-actions">
+                            <button class="btn-action" style="flex: 0 0 100%;" id="btn-next-1" onclick="nextStep(1)" disabled>
+                                Continuar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="step-2" class="form-step">
+                        <h3>Informações Pessoais</h3>
+                        <div class="form-group">
+                            <label>Nome Completo *</label>
+                            <input type="text" id="h-nome" placeholder="Ex: Dr. Roberto Alves" oninput="validateStep2()">
+                        </div>
+                        <div class="form-group">
+                            <label>Telefone</label>
+                            <input type="text" id="h-telefone" placeholder="(00) 00000-0000">
+                        </div>
+                        <div class="form-group">
+                            <label>Documento de Identificação *</label>
+                            <input type="text" id="h-id-pessoal" placeholder="RG, CRM..." oninput="validateStep2()">
+                        </div>
+                        <div class="step-actions">
+                            <button class="btn-action btn-secondary" onclick="prevStep(2)">Voltar</button>
+                            <button class="btn-action" id="btn-next-2" onclick="nextStep(2)" disabled>Continuar</button>
+                        </div>
+                    </div>
+
+                    <div id="step-3" class="form-step">
+                        <h3>Finalizar Registo</h3>
+                        <div class="aviso-laranja">
+                            <strong>Atenção:</strong> Verifique os dados abaixo.<br>
+                            <span id="summary-nome" style="color: var(--text-muted)"></span> | Doc: <span id="summary-id" style="color: var(--text-muted)"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>ID de Contratação do Hospital *</label>
+                            <input type="text" id="h-id-hospital" class="codigo-hospital" placeholder="MC-XXXX" oninput="validateStep3()">
+                        </div>
+                        <div class="step-actions">
+                            <button class="btn-action btn-secondary" onclick="prevStep(3)">Voltar</button>
+                            <button class="btn-action" id="btn-finish" onclick="finishHiring()" disabled>Finalizar Registo</button>
+                        </div>
+                    </div>
+
+                    <div id="step-success" class="form-step success-screen">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <h2>Tudo Pronto</h2>
+                        <p>O colaborador <strong id="success-nome"></strong> foi adicionado à base de dados com o ID <strong id="success-id"></strong>.</p>
+                        <a class="success-link" onclick="resetHiringProcess()">Novo Registo</a>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section id="funcionarios" class="content-section">
+                <div class="page-header">
+                    <h1>Funcionários</h1>
+                </div>
+
+                <div class="employees-card">
+                    <div class="employees-header">
+                        <h3>Quadro de Funcionários</h3>
+                    </div>
+                    <div class="employees-table-wrapper">
+                        <table class="employees-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Cargo</th>
+                                    <th>Telefone</th>
+                                    <th>Status</th>
+                                    <th style="text-align: right;">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-funcionarios-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <div class="modal" id="modal-config-form">
+        <div class="modal-body">
+            <div class="modal-close" onclick="toggleModal('modal-config-form', false)"></div>
+            
+            <h2 style="margin-bottom: 5px; font-size: 1.3rem;">Configuração do Formulário</h2>
+            <p style="font-size: 0.85rem; margin-bottom: 20px;">
+                Adicione campos personalizados ao primeiro passo da entrevista.
+            </p>
+
+            <div class="form-builder">
+                <div class="form-group">
+                    <label>Pergunta</label>
+                    <input type="text" id="nova-pergunta" placeholder="Ex: Qual a especialidade?">
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Resposta</label>
+                    <select id="tipo-resposta">
+                        <option value="texto">Texto Curto</option>
+                        <option value="paragrafo">Texto Longo</option>
+                        <option value="multipla">Menu Suspenso</option>
+                        <option value="anexo">Ficheiro / Anexo</option>
+                    </select>
+                </div>
+                <button type="button" class="btn-action btn-secondary" style="width: 100%; border: 1px dashed var(--text-muted);" onclick="adicionarPergunta()">
+                    <i class="fa-solid fa-plus"></i> Adicionar Campo
+                </button>
+            </div>
+
+            <h3 style="font-size: 0.95rem; margin-bottom: 10px;">Campos Ativos</h3>
+            
+            <div class="questions-list">
+                <div class="question-item" style="opacity: 0.6; background: transparent;">
+                    <div class="question-info">
+                        <strong>Dados Base (Sistema)</strong>
+                        <small><i class="fa-solid fa-lock"></i> Requerido</small>
+                    </div>
+                </div>
+                <div id="perguntas-dinamicas-modal" style="display: contents;"></div>
+            </div>
+            
+        </div>
+    </div>
+
+    <div class="modal" id="modal-novo-aviso">
+        <div class="modal-body">
+            <div class="modal-close" onclick="toggleModal('modal-novo-aviso', false)"></div>
+            
+            <h2 style="margin-bottom: 20px; font-size: 1.3rem;">Publicar Novo Aviso</h2>
+            
+            <form id="form-aviso" onsubmit="criarAviso(event)">
+                <div class="form-group">
+                    <label>Título do Aviso *</label>
+                    <input type="text" id="aviso-titulo" required placeholder="Ex: Atualização de Protocolo">
+                </div>
+                <div class="form-group">
+                    <label>Mensagem *</label>
+                    <textarea id="aviso-mensagem" rows="4" required placeholder="Escreva os detalhes aqui..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Nível de Prioridade</label>
+                    <select id="aviso-prioridade">
+                        <option value="info">Informativo (Normal)</option>
+                        <option value="urgente">Urgente (Alta Prioridade)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-action" style="width: 100%; margin-top: 10px;">
+                    <i class="fa-solid fa-paper-plane"></i> Publicar no Mural
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-mudar-cargo">
+        <div class="modal-body" style="max-width: 520px;">
+            <div class="modal-close" onclick="cancelarMudancaCargo()"></div>
+            <h2 style="margin-bottom: 10px; font-size: 1.3rem;">Confirmar Mudança de Cargo</h2>
+            <p style="font-size: 0.92rem; margin-bottom: 20px;">
+                Você está prestes a alterar o cargo do colaborador <strong id="cargo-confirm-nome"></strong>.
+            </p>
+
+            <div class="aviso-laranja" style="margin-bottom: 22px;">
+                <strong>Cargo Atual:</strong> <span id="cargo-confirm-atual"></span><br>
+                <strong>Novo Cargo:</strong> <span id="cargo-confirm-novo"></span>
+            </div>
+
+            <div class="step-actions" style="margin-top: 0;">
+                <button type="button" class="btn-action btn-secondary" onclick="cancelarMudancaCargo()">Cancelar</button>
+                <button type="button" class="btn-action" onclick="confirmarMudancaCargo()">Confirmar Alteração</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-demitir-funcionario">
+        <div class="modal-body" style="max-width: 640px;">
+            <div class="modal-close" onclick="cancelarDemissao()"></div>
+            <h2 style="margin-bottom: 8px; font-size: 1.3rem;">Ficha para Demissão</h2>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;" id="demissao-subtitulo">
+                Etapa 1: Informações do Médico
+            </p>
+
+            <div id="demissao-etapa-1" class="form-step active">
+                <div class="employee-sheet">
+                    <div class="employee-sheet-item">
+                        <strong>Nome Completo</strong>
+                        <span id="demissao-nome"></span>
+                    </div>
+                    <div class="employee-sheet-item">
+                        <strong>ID</strong>
+                        <span id="demissao-id"></span>
+                    </div>
+                    <div class="employee-sheet-item">
+                        <strong>Telefone</strong>
+                        <span id="demissao-telefone"></span>
+                    </div>
+                    <div class="employee-sheet-item">
+                        <strong>Cargo Atual</strong>
+                        <span id="demissao-cargo"></span>
+                    </div>
+                    <div class="employee-sheet-item" style="grid-column: 1 / -1;">
+                        <strong>Tempo de Contratação</strong>
+                        <span id="demissao-tempo"></span>
+                    </div>
+                </div>
+
+                <div class="step-actions">
+                    <button type="button" class="btn-action btn-secondary" onclick="cancelarDemissao()">Cancelar</button>
+                    <button type="button" class="btn-action" onclick="irParaEtapaDemissao(2)">Avançar</button>
+                </div>
+            </div>
+
+            <div id="demissao-etapa-2" class="form-step">
+                <div class="form-group">
+                    <label>Aplicar multa?</label>
+                    <div class="radio-group-inline">
+                        <div class="radio-line">
+                            <input type="radio" name="demissao-multa" id="demissao-multa-nao" value="nao" checked onchange="alternarCampoMulta()">
+                            <label for="demissao-multa-nao" style="margin:0;">Não aplicar multa</label>
+                        </div>
+                        <div class="radio-line">
+                            <input type="radio" name="demissao-multa" id="demissao-multa-sim" value="sim" onchange="alternarCampoMulta()">
+                            <label for="demissao-multa-sim" style="margin:0;">Sim, aplicar multa</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="multa-box" id="demissao-multa-box">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Valor da multa</label>
+                        <select id="demissao-valor-multa" onchange="validarConfirmacaoDemissao()">
+                            <option value="">Selecionar valor...</option>
+                            <option value="150000">150k (15 dias de contratado)</option>
+                            <option value="1000000">1kk (7 dias trabalhados)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Motivo da demissão *</label>
+                    <textarea id="demissao-motivo" rows="3" placeholder="Descreva o motivo..." oninput="validarConfirmacaoDemissao()"></textarea>
+                </div>
+
+                <div class="step-actions">
+                    <button type="button" class="btn-action btn-secondary" onclick="irParaEtapaDemissao(1)">Voltar</button>
+                    <button type="button" class="btn-action" id="btn-confirmar-demissao" onclick="confirmarDemissao()" disabled>
+                        Confirmar Demissão
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Tema macOS ---
+        function toggleTheme() {
+            const body = document.documentElement;
+            const btn = document.getElementById('themeBtn');
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                btn.innerHTML = '<i class="fa-solid fa-moon"></i> Aspecto Escuro';
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                btn.innerHTML = '<i class="fa-solid fa-sun"></i> Aspecto Claro';
+            }
+        }
+
+        // --- Navegação e Modais ---
+        function showTab(tabId) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        function toggleModal(id, show) {
+            document.getElementById(id).style.display = show ? 'flex' : 'none';
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.classList.contains('modal')) return;
+            if (event.target.id === 'modal-mudar-cargo') {
+                cancelarMudancaCargo();
+                return;
+            }
+            if (event.target.id === 'modal-demitir-funcionario') {
+                cancelarDemissao();
+                return;
+            }
+            event.target.style.display = 'none';
+        }
+
+        // --- CÉREBRO DO MURAL DE AVISOS ---
+        function criarAviso(event) {
+            event.preventDefault();
+
+            const titulo = document.getElementById('aviso-titulo').value;
+            const mensagem = document.getElementById('aviso-mensagem').value;
+            const prioridade = document.getElementById('aviso-prioridade').value;
+
+            const grid = document.getElementById('mural-grid');
+            
+            let tagHTML = '';
+            if (prioridade === 'urgente') {
+                tagHTML = `<span style="color: var(--apple-red); font-weight: 600;"><i class="fa-solid fa-circle-exclamation"></i> Urgente</span>`;
+            } else {
+                tagHTML = `<span style="color: var(--apple-green); font-weight: 600;"><i class="fa-solid fa-circle-info"></i> Informativo</span>`;
+            }
+
+            const novoCard = document.createElement('div');
+            novoCard.className = 'mac-card';
+            novoCard.style.animation = 'fadeIn 0.4s ease';
+            novoCard.innerHTML = `
+                <div class="mac-card-header">
+                    ${tagHTML}
+                    <small>Agora mesmo</small>
+                </div>
+                <h3 style="margin-bottom: 10px; font-size: 1.15rem; color: var(--text-main);">${titulo}</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">${mensagem}</p>
+            `;
+
+            grid.insertBefore(novoCard, grid.firstChild);
+
+            toggleModal('modal-novo-aviso', false);
+            document.getElementById('form-aviso').reset();
+        }
+
+        // --- CÉREBRO DA SINCRONIZAÇÃO (RH) ---
+        let perguntasPersonalizadas = [];
+        let contadorPerguntas = 0;
+
+        function adicionarPergunta() {
+            const inputPergunta = document.getElementById('nova-pergunta');
+            const selectTipo = document.getElementById('tipo-resposta');
+
+            const textoPergunta = inputPergunta.value.trim();
+            const tipoTexto = selectTipo.options[selectTipo.selectedIndex].text;
+            const tipoValor = selectTipo.value;
+
+            if (textoPergunta === '') {
+                alert('Insira o título da pergunta.');
+                return;
+            }
+
+            contadorPerguntas++;
+            perguntasPersonalizadas.push({
+                id: 'perg-' + contadorPerguntas,
+                titulo: textoPergunta,
+                tipoValor: tipoValor,
+                tipoTexto: tipoTexto
+            });
+
+            inputPergunta.value = '';
+            renderizarPerguntas();
+        }
+
+        function removerPergunta(idParaRemover) {
+            perguntasPersonalizadas = perguntasPersonalizadas.filter(p => p.id !== idParaRemover);
+            renderizarPerguntas();
+        }
+
+        function renderizarPerguntas() {
+            const listaModal = document.getElementById('perguntas-dinamicas-modal');
+            const listaStepper = document.getElementById('campos-dinamicos-stepper');
+
+            listaModal.innerHTML = '';
+            listaStepper.innerHTML = '';
+
+            perguntasPersonalizadas.forEach(p => {
+                let icone = 'fa-align-left';
+                if (p.tipoValor === 'paragrafo') icone = 'fa-align-justify';
+                if (p.tipoValor === 'multipla') icone = 'fa-chevron-down';
+                if (p.tipoValor === 'anexo') icone = 'fa-paperclip';
+
+                listaModal.innerHTML += `
+                    <div class="question-item">
+                        <div class="question-info">
+                            <strong>${p.titulo}</strong>
+                            <small><i class="fa-solid ${icone}"></i> ${p.tipoTexto}</small>
+                        </div>
+                        <button class="btn-delete" onclick="removerPergunta('${p.id}')">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+
+                let campoHTML = '';
+                if (p.tipoValor === 'texto') campoHTML = `<input type="text" placeholder="Resposta...">`;
+                else if (p.tipoValor === 'paragrafo') campoHTML = `<textarea rows="2" placeholder="Resposta..."></textarea>`;
+                else if (p.tipoValor === 'multipla') campoHTML = `<select><option value="">Selecionar...</option><option>Sim</option><option>Não</option></select>`;
+                else if (p.tipoValor === 'anexo') campoHTML = `<input type="file" style="padding:7px; background: transparent; border: 1px dashed var(--border-element); box-shadow: none; color: var(--text-main);">`;
+
+                listaStepper.innerHTML += `
+                    <div class="form-group" style="animation: fadeIn 0.3s ease;">
+                        <label>${p.titulo}</label>
+                        ${campoHTML}
+                    </div>
+                `;
+            });
+        }
+
+        // --- CÉREBRO DO STEPPER (RH) ---
+        let currentStep = 1;
+        let hiringData = {};
+
+        function validateStep1() {
+            const exp = document.getElementById('h-experiencia').value.trim();
+            const disp = document.getElementById('h-disponibilidade').value;
+            document.getElementById('btn-next-1').disabled = !(exp !== '' && disp !== '');
+        }
+
+        function validateStep2() {
+            const nome = document.getElementById('h-nome').value.trim();
+            const doc = document.getElementById('h-id-pessoal').value.trim();
+            document.getElementById('btn-next-2').disabled = !(nome !== '' && doc !== '');
+        }
+
+        function validateStep3() {
+            const idHosp = document.getElementById('h-id-hospital').value.trim();
+            document.getElementById('btn-finish').disabled = !(idHosp !== '');
+        }
+
+        function updateProgressBar() {
+            document.getElementById('progress-line').style.width = ((currentStep - 1) / 2) * 100 + '%';
+            for (let i = 1; i <= 3; i++) {
+                const circle = document.getElementById(`circle-${i}`);
+                if (i < currentStep) {
+                    circle.classList.add('completed');
+                    circle.classList.remove('active');
+                    circle.innerHTML = '<i class="fa-solid fa-check"></i>';
+                } else if (i === currentStep) {
+                    circle.classList.add('active');
+                    circle.classList.remove('completed');
+                    circle.innerHTML = i;
+                } else {
+                    circle.classList.remove('active', 'completed');
+                    circle.innerHTML = i;
+                }
+            }
+        }
+
+        function nextStep(step) {
+            if (step === 2) {
+                hiringData.nome = document.getElementById('h-nome').value;
+                hiringData.idPessoal = document.getElementById('h-id-pessoal').value;
+                document.getElementById('summary-nome').innerText = hiringData.nome;
+                document.getElementById('summary-id').innerText = hiringData.idPessoal;
+            }
+            document.getElementById(`step-${step}`).classList.remove('active');
+            currentStep++;
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+            updateProgressBar();
+        }
+
+        function prevStep(step) {
+            document.getElementById(`step-${step}`).classList.remove('active');
+            currentStep--;
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+            updateProgressBar();
+        }
+
+        function finishHiring() {
+            hiringData.idHospital = document.getElementById('h-id-hospital').value;
+            document.getElementById('success-nome').innerText = hiringData.nome;
+            document.getElementById('success-id').innerText = hiringData.idHospital;
+            document.getElementById('step-3').classList.remove('active');
+            document.getElementById('progress-container').style.display = 'none';
+            document.getElementById('step-success').classList.add('active');
+        }
+
+        function resetHiringProcess() {
+            currentStep = 1;
+            hiringData = {};
+            document.getElementById('h-experiencia').value = '';
+            document.getElementById('h-motivo').value = '';
+            document.getElementById('h-disponibilidade').value = '';
+            document.getElementById('h-nome').value = '';
+            document.getElementById('h-telefone').value = '';
+            document.getElementById('h-id-pessoal').value = '';
+            document.getElementById('h-id-hospital').value = '';
+            validateStep1(); validateStep2(); validateStep3();
+            document.getElementById('step-success').classList.remove('active');
+            document.getElementById('progress-container').style.display = 'flex';
+            document.getElementById('step-1').classList.add('active');
+            updateProgressBar();
+        }
+
+        // ==========================================
+        // CÉREBRO: QUADRO DE FUNCIONÁRIOS
+        // ==========================================
+
+        // Hierarquia de cargos para a função Upar/Rebaixar
+        const hierarquiaCargos = [
+            'Estagiário', 'Recepcionista', 'Segurança', 'Técnico de Enfermagem',
+            'Enfermeiro', 'Enfermeiro Chefe', 'Médico Plantonista', 'Médico Cirurgião', 'Diretor Clínico'
+        ];
+
+        // Base de Dados Simulada
+        let bdFuncionarios = [
+            { id: 'MC-1042', nome: 'Dr. Roberto Alves', telefone: '(11) 99999-1111', cargo: 'Médico Cirurgião', ativo: true, contratadoEm: '2026-03-28' },
+            { id: 'MC-1088', nome: 'Ana Souza Martins', telefone: '(11) 98888-2222', cargo: 'Enfermeiro Chefe', ativo: true, contratadoEm: '2026-04-10' },
+            { id: 'MC-2005', nome: 'Carlos Lima', telefone: '(11) 97777-3333', cargo: 'Recepcionista', ativo: false, contratadoEm: '2026-04-18' },
+            { id: 'MC-2101', nome: 'Dra. Beatriz Santos', telefone: '(11) 96666-4444', cargo: 'Médico Plantonista', ativo: true, contratadoEm: '2026-04-20' }
+        ];
+        let mudancaCargoPendente = null;
+        let demissaoPendente = null;
+        let etapaDemissaoAtual = 1;
+
+        // 1. Renderizar a Tabela
+        function renderizarTabelaFuncionarios() {
+            const tbody = document.getElementById('tabela-funcionarios-body');
+            if (!tbody) return;
+
+            tbody.innerHTML = '';
+
+            if (bdFuncionarios.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 30px;">Nenhum funcionário na base de dados.</td></tr>';
+                return;
+            }
+
+            bdFuncionarios.forEach(func => {
+                const statusBadge = func.ativo
+                    ? `<span class="emp-badge on" onclick="alternarStatus('${func.id}')" title="Clique para alterar status"><i class="fa-solid fa-circle-check"></i> Em Serviço</span>`
+                    : `<span class="emp-badge off" onclick="alternarStatus('${func.id}')" title="Clique para alterar status"><i class="fa-solid fa-moon"></i> Ausente</span>`;
+                const opcoesCargo = hierarquiaCargos
+                    .map(cargo => `<option value="${cargo}" ${cargo === func.cargo ? 'selected' : ''}>${cargo}</option>`)
+                    .join('');
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><span class="id-text">${func.id}</span></td>
+                        <td style="font-weight: 500;">${func.nome}</td>
+                        <td>
+                            <select class="cargo-select" onchange="prepararMudancaCargo('${func.id}', this.value)">
+                                ${opcoesCargo}
+                            </select>
+                        </td>
+                        <td style="color: var(--text-muted);">${func.telefone}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <div class="action-group" style="justify-content: flex-end;">
+                                <button class="btn-icon danger" onclick="demitirFuncionario('${func.id}')" title="Demitir"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // 2. Alternar Status (On/Off)
+        function alternarStatus(id) {
+            const func = bdFuncionarios.find(f => f.id === id);
+            if (func) func.ativo = !func.ativo;
+            renderizarTabelaFuncionarios();
+        }
+
+        // 3. Alterar Cargo (com confirmação em modal)
+        function prepararMudancaCargo(id, novoCargo) {
+            const func = bdFuncionarios.find(f => f.id === id);
+            if (!func) return;
+
+            if (!hierarquiaCargos.includes(novoCargo)) {
+                renderizarTabelaFuncionarios();
+                return;
+            }
+
+            if (novoCargo === func.cargo) return;
+
+            mudancaCargoPendente = {
+                id: func.id,
+                nome: func.nome,
+                cargoAtual: func.cargo,
+                novoCargo: novoCargo
+            };
+
+            document.getElementById('cargo-confirm-nome').innerText = func.nome;
+            document.getElementById('cargo-confirm-atual').innerText = func.cargo;
+            document.getElementById('cargo-confirm-novo').innerText = novoCargo;
+            toggleModal('modal-mudar-cargo', true);
+        }
+
+        function confirmarMudancaCargo() {
+            if (!mudancaCargoPendente) return;
+
+            const func = bdFuncionarios.find(f => f.id === mudancaCargoPendente.id);
+            if (func) {
+                func.cargo = mudancaCargoPendente.novoCargo;
+            }
+            mudancaCargoPendente = null;
+            toggleModal('modal-mudar-cargo', false);
+            renderizarTabelaFuncionarios();
+        }
+
+        function cancelarMudancaCargo() {
+            mudancaCargoPendente = null;
+            toggleModal('modal-mudar-cargo', false);
+            renderizarTabelaFuncionarios();
+        }
+
+        // 4. Demitir Funcionário
+        function demitirFuncionario(id) {
+            const func = bdFuncionarios.find(f => f.id === id);
+            if (!func) return;
+
+            demissaoPendente = { id: func.id };
+            document.getElementById('demissao-nome').innerText = func.nome;
+            document.getElementById('demissao-id').innerText = func.id;
+            document.getElementById('demissao-telefone').innerText = func.telefone;
+            document.getElementById('demissao-cargo').innerText = func.cargo;
+            document.getElementById('demissao-tempo').innerText = formatarTempoContratacao(func.contratadoEm);
+            document.getElementById('demissao-motivo').value = '';
+            document.getElementById('demissao-multa-nao').checked = true;
+            document.getElementById('demissao-valor-multa').value = '';
+            alternarCampoMulta();
+            validarConfirmacaoDemissao();
+            irParaEtapaDemissao(1);
+            toggleModal('modal-demitir-funcionario', true);
+        }
+
+        function irParaEtapaDemissao(etapa) {
+            etapaDemissaoAtual = etapa;
+            document.getElementById('demissao-etapa-1').classList.toggle('active', etapa === 1);
+            document.getElementById('demissao-etapa-2').classList.toggle('active', etapa === 2);
+            document.getElementById('demissao-subtitulo').innerText = etapa === 1
+                ? 'Etapa 1: Informações do Médico'
+                : 'Etapa 2: Multa e Motivo da Demissão';
+        }
+
+        function diasDesdeContratacao(dataISO) {
+            const hoje = new Date();
+            const contratado = new Date(dataISO + 'T00:00:00');
+            const diffMs = hoje - contratado;
+            return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+        }
+
+        function formatarTempoContratacao(dataISO) {
+            const dias = diasDesdeContratacao(dataISO);
+            if (dias === 1) return '1 dia de contratado';
+            return `${dias} dias de contratado`;
+        }
+
+        function alternarCampoMulta() {
+            const aplicarMulta = document.getElementById('demissao-multa-sim').checked;
+            const box = document.getElementById('demissao-multa-box');
+            const select = document.getElementById('demissao-valor-multa');
+            box.classList.toggle('show', aplicarMulta);
+            if (!aplicarMulta) {
+                select.value = '';
+            }
+            validarConfirmacaoDemissao();
+        }
+
+        function validarConfirmacaoDemissao() {
+            const motivo = document.getElementById('demissao-motivo').value.trim();
+            const aplicarMulta = document.getElementById('demissao-multa-sim').checked;
+            const valorMulta = document.getElementById('demissao-valor-multa').value;
+            const podeConfirmar = motivo !== '' && (!aplicarMulta || valorMulta !== '');
+            document.getElementById('btn-confirmar-demissao').disabled = !podeConfirmar;
+        }
+
+        function confirmarDemissao() {
+            if (!demissaoPendente) return;
+
+            const aplicarMulta = document.getElementById('demissao-multa-sim').checked;
+            const motivo = document.getElementById('demissao-motivo').value.trim();
+            const valorMulta = document.getElementById('demissao-valor-multa').value;
+            if (motivo === '') return;
+            if (aplicarMulta && valorMulta === '') return;
+
+            bdFuncionarios = bdFuncionarios.filter(f => f.id !== demissaoPendente.id);
+            demissaoPendente = null;
+            toggleModal('modal-demitir-funcionario', false);
+            renderizarTabelaFuncionarios();
+        }
+
+        function cancelarDemissao() {
+            demissaoPendente = null;
+            etapaDemissaoAtual = 1;
+            toggleModal('modal-demitir-funcionario', false);
+        }
+
+        // Iniciar a tabela quando a página carregar
+        window.addEventListener('DOMContentLoaded', () => {
+            renderizarTabelaFuncionarios();
+        });
+    </script>
+</body>
+</html>
