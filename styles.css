@@ -1,3 +1,9 @@
+/*
+    styles.css (estilos NUI)
+    - Define variáveis de CSS para temas claro/escuro e regras de layout e componentes.
+    - Estiliza a barra lateral, cards, modais, formulários e o stepper do fluxo de contratação.
+    - É carregado por index.html dentro da NUI.
+*/
 /* --- Variáveis de Tema (Estilo macOS) --- */
 :root {
     --desktop-bg: #c9e4d6;

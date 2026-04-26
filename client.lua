@@ -1,4 +1,14 @@
 ---@diagnostic disable: undefined-global
+--[[
+    client.lua (lado cliente)
+    - Regista o comando /openpanel e um atalho de teclado (F10) para abrir o painel NUI.
+    - Usa SetNuiFocus para ativar entrada do rato/teclado na NUI e SendNUIMessage para avisar
+      o HTML a mostrar a interface.
+    - Trata callbacks vindos da NUI (RegisterNUICallback), por exemplo 'close' para libertar o foco
+      e 'log' para mensagens de depuração.
+    - Garante que o foco é libertado se o recurso for parado (onResourceStop).
+    Este ficheiro é executado em cada cliente e faz a ponte entre ações no jogo e a interface web.
+]]
 -- Client side script to toggle NUI for the hospital panel
 local nuiOpen = false
 

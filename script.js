@@ -1,3 +1,12 @@
+/*
+    script.js (comportamento da NUI e comunicação com FiveM)
+    - Fornece funções auxiliares para abrir/fechar o painel e encaminhar eventos para o cliente.
+    - Escuta mensagens window.postMessage para abrir/fechar a interface quando SendNUIMessage é usado.
+    - Implementa a lógica da UI: alternância de tema, navegação por abas, modais, criação de avisos,
+      formulário stepper e gestão de funcionários (renderizar, alterar cargo, demitir).
+    - Quando integrado com FiveM, pode enviar POST para endpoints do recurso usando
+      o padrão especial https://{resourceName}/{action} para notificar o client.lua.
+*/
 /* NUI helpers for FiveM */
 function closePanel() {
     fetch(`https://${GetParentResourceName()}/close`, {
