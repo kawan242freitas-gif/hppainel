@@ -46,11 +46,11 @@ function toggleTheme() {
 }
 
 // --- Navegação e Modais ---
-function showTab(tabId) {
+function showTab(tabId, el) {
     document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
-    event.currentTarget.classList.add('active');
+    if (el) el.classList.add('active');
 }
 
 function toggleModal(id, show) {

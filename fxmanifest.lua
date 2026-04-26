@@ -14,12 +14,12 @@ author 'Converted by Copilot'
 description 'Medical Center Cortez NUI Panel (FiveM)'
 version '1.0.0'
 
-ui_page 'html/index.html'
+ui_page 'index.html'
 
 files {
-    'html/index.html',
-    'html/styles.css',
-    'html/script.js'
+    'index.html',
+    'styles.css',
+    'script.js'
 }
 
 client_script 'client.lua'
