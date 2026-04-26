@@ -1,373 +1,321 @@
-<!--
-    index.html (NUI para FiveM)
-    - Contém a marcação do painel Medical Center Cortez (barra lateral, secções, modais).
-    - É carregado como ui_page do recurso; o FiveM serve este ficheiro ao browser do jogo.
-    - Interage com script.js para comportamento dinâmico (abrir/fechar, formulários, stepper, etc.).
-    - Mantenha os caminhos para styles e scripts relativos a este ficheiro.
--->
 <!DOCTYPE html>
-<html lang="pt-pt">
+<html lang="pt-PT" class="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Center Cortez - Painel macOS</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Painel Hospitalar macOS</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: {} }
+        }
+    </script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="transition-colors duration-500">
 
-    <div class="app-window">
+    <!-- Wrapper Principal (Fundo e Tema) -->
+    <div id="app-wrapper" class="min-h-screen w-full flex items-center justify-center bg-cover bg-center transition-all duration-500 bg-slate-100 dark:bg-slate-950"
+         style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');">
         
-        <aside class="sidebar">
-            <div class="mac-controls">
-                <div class="mac-btn mac-close"></div>
-                <div class="mac-btn mac-min"></div>
-                <div class="mac-btn mac-max"></div>
-            </div>
-
-            <div class="brand">
-                <i class="fa-solid fa-house-medical"></i>
-                <h2>MC Cortez</h2>
-            </div>
-
-            <ul class="nav-menu">
-                <li class="nav-item active" onclick="showTab('home', this)">
-                    <i class="fa-solid fa-house"></i> Visão Geral
-                </li>
-                <li class="nav-item" onclick="showTab('mural', this)">
-                    <i class="fa-solid fa-message"></i> Mural de Avisos
-                </li>
-                <li class="nav-item" onclick="showTab('contratacao', this)">
-                    <i class="fa-solid fa-file-signature"></i> Contratação
-                </li>
-                <li class="nav-item" onclick="showTab('funcionarios', this)">
-                    <i class="fa-solid fa-id-badge"></i> Funcionários
-                </li>
-            </ul>
+        <!-- Janela Ecrã Inteiro -->
+        <div class="w-full h-screen flex flex-col overflow-hidden backdrop-blur-xl transition-all duration-300 bg-white/80 dark:bg-slate-900/80 text-slate-800 dark:text-slate-100">
             
-            <div class="sidebar-footer">
-                <button class="theme-switch" onclick="toggleTheme()" id="themeBtn">
-                    <i class="fa-solid fa-moon"></i> Aspecto Escuro
+            <!-- Barra de Título (macOS Traffic Lights) -->
+            <div class="h-12 flex items-center justify-between px-4 select-none border-b border-slate-200/50 bg-white/30 dark:border-slate-700/50 dark:bg-slate-800/30">
+                <div class="flex gap-2">
+                    <div onclick="closePanel()" title="Fechar (ESC)" class="w-3.5 h-3.5 rounded-full bg-red-500 border border-red-600/50 cursor-pointer hover:opacity-80"></div>
+                    <div class="w-3.5 h-3.5 rounded-full bg-yellow-500 border border-yellow-600/50 cursor-pointer hover:opacity-80"></div>
+                    <div class="w-3.5 h-3.5 rounded-full bg-green-500 border border-green-600/50 cursor-pointer hover:opacity-80"></div>
+                </div>
+                <div id="window-title" class="text-xs font-semibold tracking-wide opacity-50 flex-1 text-center">
+                    HOSPITAL SYSTEM OS // VISÃO GERAL
+                </div>
+                <button onclick="toggleTheme()" class="p-1.5 rounded-md hover:bg-slate-500/20 transition-colors">
+                    <i id="theme-icon" data-lucide="moon" class="w-4 h-4"></i>
                 </button>
-                <div class="user-profile">
-                    <img src="https://ui-avatars.com/api/?name=Dr+Cortez&background=e5e5ea&color=1d1d1f" alt="Foto">
-                    <div class="user-info">
-                        <h4>Dr. Cortez</h4>
-                        <span class="status-badge"><i class="fa-solid fa-circle"></i> Disponível</span>
-                    </div>
-                </div>
             </div>
-        </aside>
 
-        <main class="main">
-            
-            <section id="home" class="content-section active">
-                <div class="page-header">
-                    <h1>Visão Geral</h1>
-                </div>
-
-                <div class="welcome-banner">
-                    <h2>Olá, Dr. Cortez</h2>
-                    <p>Eis o resumo das atividades do Medical Center hoje.</p>
-                </div>
-
-                <div class="grid">
-                    <div class="mac-card">
-                        <div class="mac-card-header">
-                            <span>Pacientes Internados</span>
-                            <i class="fa-solid fa-bed-pulse"></i>
-                        </div>
-                        <div class="mac-card-metric">142</div>
-                        <div class="mac-card-trend"><i class="fa-solid fa-arrow-trend-up"></i> +5% esta semana</div>
-                    </div>
-
-                    <div class="mac-card">
-                        <div class="mac-card-header">
-                            <span>Processos de RH (Ativos)</span>
-                            <i class="fa-solid fa-users"></i>
-                        </div>
-                        <div class="mac-card-metric">8</div>
-                        <div class="mac-card-trend" style="color: var(--text-muted)"><i class="fa-solid fa-minus"></i> Sem alterações</div>
-                    </div>
-
-                    <div class="mac-card">
-                        <div class="mac-card-header">
-                            <span>Taxa de Ocupação (UTI)</span>
-                            <i class="fa-solid fa-heart-pulse"></i>
-                        </div>
-                        <div class="mac-card-metric">85%</div>
-                        <div class="mac-card-trend" style="color: var(--apple-red)"><i class="fa-solid fa-arrow-trend-up"></i> Lotação próxima</div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="mural" class="content-section">
-                <div class="page-header">
-                    <h1>Mural de Avisos</h1>
-                    <div class="header-actions">
-                        <button class="btn-action" onclick="toggleModal('modal-novo-aviso', true)">
-                            <i class="fa-solid fa-plus"></i> Novo Aviso
-                        </button>
-                    </div>
-                </div>
-
-                <div class="grid" id="mural-grid">
-                    <div class="mac-card">
-                        <div class="mac-card-header">
-                            <span style="color: var(--apple-red); font-weight: 600;"><i class="fa-solid fa-circle-exclamation"></i> Urgente</span>
-                            <small>Hoje, 08:30</small>
-                        </div>
-                        <h3 style="margin-bottom: 10px; font-size: 1.15rem;">Manutenção no Tomógrafo</h3>
-                        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">O equipamento da Ala Leste estará inoperante das 14h às 16h para manutenção preventiva programada.</p>
-                    </div>
-
-                    <div class="mac-card">
-                        <div class="mac-card-header">
-                            <span style="color: var(--apple-green); font-weight: 600;"><i class="fa-solid fa-circle-info"></i> Informativo</span>
-                            <small>Ontem, 14:00</small>
-                        </div>
-                        <h3 style="margin-bottom: 10px; font-size: 1.15rem;">Reunião Corpo Clínico</h3>
-                        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">Reunião geral na próxima sexta-feira no auditório principal para revisão das novas diretrizes de triagem.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section id="contratacao" class="content-section">
+            <!-- Corpo (Sidebar + Content) -->
+            <div class="flex flex-1 overflow-hidden">
                 
-                <div class="page-header">
-                    <h1>Recursos Humanos</h1>
-                    <div class="header-actions">
-                        <button class="btn-action btn-secondary" onclick="toggleModal('modal-config-form', true)">
-                            <i class="fa-solid fa-slider"></i> Configurar Vaga
-                        </button>
+                <!-- Sidebar Inteligente -->
+                <div class="w-20 sm:w-64 flex flex-col border-r border-slate-200/50 bg-white/40 dark:border-slate-700/50 dark:bg-slate-900/50">
+                    <div class="p-4 sm:p-6 pb-2">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/30 mb-2">
+                            H
+                        </div>
+                        <h1 class="font-bold text-lg hidden sm:block tracking-tight">MedPanel Pro</h1>
+                    </div>
+
+                    <nav class="flex-1 px-3 py-4 flex flex-col gap-1 overflow-y-auto no-scrollbar" id="nav-menu">
+                        <!-- Gerado por JS -->
+                    </nav>
+
+                    <!-- Perfil Fixo no Rodapé -->
+                    <div class="p-4 border-t border-slate-200/50 bg-white/80 dark:border-slate-700/50 dark:bg-slate-900/80">
+                        <div class="flex items-center gap-3">
+                            <div class="relative">
+                                <i data-lucide="user-circle" class="w-9 h-9 text-slate-400"></i>
+                                <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
+                            </div>
+                            <div class="hidden sm:block flex-1 min-w-0">
+                                <p class="text-sm font-semibold truncate">Dr. Cortez</p>
+                                <p class="text-xs text-green-600 dark:text-green-400 font-medium">Disponível</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="stepper-card">
-                    <div class="progress-container" id="progress-container">
-                        <div class="progress-line" id="progress-line"></div>
-                        <div class="step-circle active" id="circle-1">1</div>
-                        <div class="step-circle" id="circle-2">2</div>
-                        <div class="step-circle" id="circle-3">3</div>
+                <!-- Área de Conteúdo Principal -->
+                <div class="flex-1 overflow-y-auto p-6 sm:p-10 relative scroll-smooth no-scrollbar">
+                    
+                    <!-- TAB: HOME -->
+                    <div id="tab-home" class="tab-content fade-in slide-in-bottom">
+                        <div class="mb-8">
+                            <h2 class="text-3xl font-light mb-2">Bom dia, Dr. Cortez</h2>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Aqui está o resumo da sua unidade hospitalar hoje.</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="p-6 rounded-2xl shadow-sm border backdrop-blur-md bg-white/60 border-white/40 dark:bg-slate-800/50 dark:border-slate-700/50">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="p-3 rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400">
+                                        <i data-lucide="activity"></i>
+                                    </div>
+                                    <span class="text-xs font-semibold px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">+12%</span>
+                                </div>
+                                <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Pacientes Internados</h3>
+                                <p class="text-3xl font-semibold mt-1">142</p>
+                            </div>
+                            <div class="p-6 rounded-2xl shadow-sm border backdrop-blur-md bg-white/60 border-white/40 dark:bg-slate-800/50 dark:border-slate-700/50">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="p-3 rounded-xl bg-purple-100 text-purple-600 dark:bg-purple-900/50 dark:text-purple-400">
+                                        <i data-lucide="briefcase"></i>
+                                    </div>
+                                    <span class="text-xs font-semibold px-2 py-1 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Em curso</span>
+                                </div>
+                                <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Processos de RH Ativos</h3>
+                                <p class="text-3xl font-semibold mt-1">4</p>
+                            </div>
+                            <div class="p-6 rounded-2xl shadow-sm border backdrop-blur-md bg-white/60 border-white/40 dark:bg-slate-800/50 dark:border-slate-700/50">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="p-3 rounded-xl bg-rose-100 text-rose-600 dark:bg-rose-900/50 dark:text-rose-400">
+                                        <i data-lucide="heart-pulse"></i>
+                                    </div>
+                                    <span class="text-xs font-semibold px-2 py-1 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">Crítico</span>
+                                </div>
+                                <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Taxa Ocupação UTI</h3>
+                                <p class="text-3xl font-semibold mt-1">94%</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <div id="step-1" class="form-step active">
-                        <h3>A Entrevista</h3>
-                        <div class="form-group">
-                            <label>Experiência Profissional *</label>
-                            <textarea id="h-experiencia" rows="3" placeholder="Histórico do candidato..." oninput="validateStep1()"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Motivo da Contratação</label>
-                            <input type="text" id="h-motivo" placeholder="Por que o Cortez?">
-                        </div>
-                        <div class="form-group">
-                            <label>Disponibilidade de Plantões *</label>
-                            <select id="h-disponibilidade" onchange="validateStep1()">
-                                <option value="">Selecionar opção...</option>
-                                <option value="sim">Pode realizar plantões</option>
-                                <option value="nao">Sem disponibilidade de plantão</option>
-                            </select>
-                        </div>
-
-                        <div id="campos-dinamicos-stepper"></div>
-
-                        <div class="step-actions">
-                            <button class="btn-action" style="flex: 0 0 100%;" id="btn-next-1" onclick="nextStep(1)" disabled>
-                                Continuar
+                    <!-- TAB: AVISOS -->
+                    <div id="tab-avisos" class="tab-content hidden h-full flex flex-col fade-in slide-in-bottom">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-semibold">Mural de Avisos</h2>
+                            <button onclick="toggleModal('modal-aviso')" class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm">
+                                <i data-lucide="plus" class="w-4 h-4"></i> Novo Aviso
                             </button>
                         </div>
-                    </div>
-
-                    <div id="step-2" class="form-step">
-                        <h3>Informações Pessoais</h3>
-                        <div class="form-group">
-                            <label>Nome Completo *</label>
-                            <input type="text" id="h-nome" placeholder="Ex: Dr. Roberto Alves" oninput="validateStep2()">
-                        </div>
-                        <div class="form-group">
-                            <label>Telefone</label>
-                            <input type="text" id="h-telefone" placeholder="(00) 00000-0000">
-                        </div>
-                        <div class="form-group">
-                            <label>Documento de Identificação *</label>
-                            <input type="text" id="h-id-pessoal" placeholder="RG, CRM..." oninput="validateStep2()">
-                        </div>
-                        <div class="step-actions">
-                            <button class="btn-action btn-secondary" onclick="prevStep(2)">Voltar</button>
-                            <button class="btn-action" id="btn-next-2" onclick="nextStep(2)" disabled>Continuar</button>
+                        <div id="avisos-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-max">
+                            <!-- JS Inject -->
                         </div>
                     </div>
 
-                    <div id="step-3" class="form-step">
-                        <h3>Finalizar Registo</h3>
-                        <div class="aviso-laranja">
-                            <strong>Atenção:</strong> Verifique os dados abaixo.<br>
-                            <span id="summary-nome" style="color: var(--text-muted)"></span> | Doc: <span id="summary-id" style="color: var(--text-muted)"></span>
+                    <!-- TAB: CONTRATAÇÃO -->
+                    <div id="tab-contratacao" class="tab-content hidden max-w-4xl mx-auto h-full flex flex-col fade-in slide-in-bottom relative">
+                        <div class="flex justify-between items-end mb-8">
+                            <div>
+                                <h2 class="text-2xl font-semibold mb-1">Candidaturas (Respostas)</h2>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Gira as submissões ao formulário e aprove novos colaboradores.</p>
+                            </div>
+                            <button onclick="toggleModal('modal-builder')" class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-slate-300 hover:bg-slate-100 text-slate-600 dark:border-slate-600 dark:hover:bg-slate-800 dark:text-slate-300">
+                                <i data-lucide="settings-2" class="w-4 h-4"></i> Configurar Vaga
+                            </button>
                         </div>
-                        <div class="form-group">
-                            <label>ID de Contratação do Hospital *</label>
-                            <input type="text" id="h-id-hospital" class="codigo-hospital" placeholder="MC-XXXX" oninput="validateStep3()">
-                        </div>
-                        <div class="step-actions">
-                            <button class="btn-action btn-secondary" onclick="prevStep(3)">Voltar</button>
-                            <button class="btn-action" id="btn-finish" onclick="finishHiring()" disabled>Finalizar Registo</button>
+
+                        <div class="flex-1 overflow-hidden relative flex flex-col">
+                            <div id="candidates-list-view" class="flex-1 overflow-y-auto no-scrollbar rounded-2xl border backdrop-blur-md shadow-sm bg-white/60 border-slate-200 dark:bg-slate-800/40 dark:border-slate-700/50">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="text-sm uppercase tracking-wider bg-slate-50 text-slate-500 border-b border-slate-200 dark:bg-slate-900/50 dark:text-slate-400 dark:border-slate-700 sticky top-0 z-10">
+                                            <th class="p-4 font-semibold">Candidato</th>
+                                            <th class="p-4 font-semibold">Vaga/Departamento</th>
+                                            <th class="p-4 font-semibold text-center">Data</th>
+                                            <th class="p-4 font-semibold text-center">Status</th>
+                                            <th class="p-4 font-semibold text-right">Ação</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="candidates-tbody" class="divide-y divide-slate-200 dark:divide-slate-700/50"></tbody>
+                                </table>
+                            </div>
+
+                            <div id="candidate-detail-view" class="hidden absolute inset-0 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl flex flex-col overflow-hidden fade-in slide-in-right z-20">
+                                <div class="p-4 sm:p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                                    <div class="flex items-center gap-4">
+                                        <button onclick="closeCandidateView()" class="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors">
+                                            <i data-lucide="arrow-left" class="w-5 h-5 text-slate-600 dark:text-slate-300"></i>
+                                        </button>
+                                        <div>
+                                            <h3 id="detail-name" class="text-xl font-bold">Nome do Candidato</h3>
+                                            <p id="detail-role" class="text-sm text-slate-500 dark:text-slate-400">Vaga</p>
+                                        </div>
+                                    </div>
+                                    <div id="detail-status-badge"></div>
+                                </div>
+                                
+                                <div class="flex-1 overflow-y-auto p-4 sm:p-8 no-scrollbar bg-slate-50/30 dark:bg-slate-950/30">
+                                    <div class="max-w-2xl mx-auto">
+                                        <div class="mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">
+                                            <h4 class="text-xl font-semibold flex items-center gap-2">
+                                                <i data-lucide="file-text" class="w-5 h-5 text-blue-500"></i>
+                                                Formulário de Candidatura
+                                            </h4>
+                                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Respostas submetidas pelo candidato durante o processo de admissão.</p>
+                                        </div>
+                                        <div id="detail-answers" class="space-y-6"></div>
+                                    </div>
+                                </div>
+                                
+                                <div id="detail-actions" class="p-4 sm:p-6 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]"></div>
+                            </div>
                         </div>
                     </div>
 
-                    <div id="step-success" class="form-step success-screen">
-                        <i class="fa-solid fa-circle-check"></i>
-                        <h2>Tudo Pronto</h2>
-                        <p>O colaborador <strong id="success-nome"></strong> foi adicionado à base de dados com o ID <strong id="success-id"></strong>.</p>
-                        <a class="success-link" onclick="resetHiringProcess()">Novo Registo</a>
+                    <!-- TAB: EQUIPA -->
+                    <div id="tab-funcionarios" class="tab-content hidden h-full flex flex-col fade-in slide-in-bottom">
+                        <div class="mb-6 flex justify-between items-center">
+                            <div>
+                                <h2 class="text-2xl font-semibold mb-1">Gestão de Equipa</h2>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Administre cargos, status e quadros.</p>
+                            </div>
+                            <div id="equipa-total" class="px-4 py-2 rounded-lg text-sm font-medium border shadow-sm bg-white border-slate-200 text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300">
+                                Total: 0 ativos
+                            </div>
+                        </div>
+                        <div class="flex-1 rounded-xl border overflow-hidden backdrop-blur-md shadow-sm bg-white/60 border-slate-200 dark:bg-slate-800/40 dark:border-slate-700/50">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="text-sm uppercase tracking-wider bg-slate-50 text-slate-500 border-b border-slate-200 dark:bg-slate-900/50 dark:text-slate-400 dark:border-slate-700">
+                                            <th class="p-4 font-semibold">Colaborador</th>
+                                            <th class="p-4 font-semibold">Cargo (Hierarquia)</th>
+                                            <th class="p-4 font-semibold">Departamento</th>
+                                            <th class="p-4 font-semibold text-center">Status</th>
+                                            <th class="p-4 font-semibold text-right">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="funcionarios-tbody" class="divide-y divide-slate-200 dark:divide-slate-700/50"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: RANKINGS -->
+                    <div id="tab-rankings" class="tab-content hidden h-full flex flex-col fade-in slide-in-bottom">
+                        <div class="text-center mb-8">
+                            <h2 class="text-3xl font-bold mb-2 bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Quadro de Excelência</h2>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Desempenho clínico e administrativo do mês.</p>
+                        </div>
+                        <div id="podium-container" class="flex justify-center items-end gap-2 sm:gap-6 mb-12 h-64 mt-4"></div>
+                        <div id="rankings-list" class="rounded-xl border backdrop-blur-md overflow-hidden bg-white/60 border-slate-200 dark:bg-slate-800/40 dark:border-slate-700/50"></div>
                     </div>
 
                 </div>
-
-            </section>
-
-            <section id="funcionarios" class="content-section">
-                <div class="page-header">
-                    <h1>Funcionários</h1>
-                </div>
-
-                <div class="employees-card">
-                    <div class="employees-header">
-                        <h3>Quadro de Funcionários</h3>
-                    </div>
-                    <div class="employees-table-wrapper">
-                        <table class="employees-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nome</th>
-                                    <th>Cargo</th>
-                                    <th>Telefone</th>
-                                    <th>Status</th>
-                                    <th style="text-align: right;">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabela-funcionarios-body"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-        </main>
+            </div>
+        </div>
     </div>
 
-    <div class="modal" id="modal-config-form">
-        <div class="modal-body">
-            <div class="modal-close" onclick="toggleModal('modal-config-form', false)"></div>
-            
-            <h2 style="margin-bottom: 5px; font-size: 1.3rem;">Configuração do Formulário</h2>
-            <p style="font-size: 0.85rem; margin-bottom: 20px;">
-                Adicione campos personalizados ao primeiro passo da entrevista.
-            </p>
-
-            <div class="form-builder">
-                <div class="form-group">
-                    <label>Pergunta</label>
-                    <input type="text" id="nova-pergunta" placeholder="Ex: Qual a especialidade?">
+    <!-- MODAL: NOVO AVISO -->
+    <div id="modal-aviso" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md hidden transition-opacity">
+        <div class="w-full max-w-lg overflow-hidden rounded-2xl shadow-2xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl border border-slate-200 dark:border-slate-700 slide-in-bottom relative">
+            <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700/50 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400 rounded-lg">
+                        <i data-lucide="bell-plus" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-lg">Publicar Aviso</h3>
+                        <p class="text-xs opacity-60">Este aviso aparecerá no mural para toda a unidade.</p>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Tipo de Resposta</label>
-                    <select id="tipo-resposta">
-                        <option value="texto">Texto Curto</option>
-                        <option value="paragrafo">Texto Longo</option>
-                        <option value="multipla">Menu Suspenso</option>
-                        <option value="anexo">Ficheiro / Anexo</option>
-                    </select>
-                </div>
-                <button type="button" class="btn-action btn-secondary" style="width: 100%; border: 1px dashed var(--text-muted);" onclick="adicionarPergunta()">
-                    <i class="fa-solid fa-plus"></i> Adicionar Campo
+                <button onclick="toggleModal('modal-aviso')" class="p-2 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-700/60 transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
 
-            <h3 style="font-size: 0.95rem; margin-bottom: 10px;">Campos Ativos</h3>
-            
-            <div class="questions-list">
-                <div class="question-item" style="opacity: 0.6; background: transparent;">
-                    <div class="question-info">
-                        <strong>Dados Base (Sistema)</strong>
-                        <small><i class="fa-solid fa-lock"></i> Requerido</small>
-                    </div>
+            <div class="p-6 space-y-4">
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Título *</label>
+                    <input id="aviso-title" oninput="validateAviso()" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500/40" placeholder="Ex: Atualização de protocolo" />
                 </div>
-                <div id="perguntas-dinamicas-modal" style="display: contents;"></div>
-            </div>
-            
-        </div>
-    </div>
-
-    <div class="modal" id="modal-novo-aviso">
-        <div class="modal-body">
-            <div class="modal-close" onclick="toggleModal('modal-novo-aviso', false)"></div>
-            
-            <h2 style="margin-bottom: 20px; font-size: 1.3rem;">Publicar Novo Aviso</h2>
-            
-            <form id="form-aviso" onsubmit="criarAviso(event)">
-                <div class="form-group">
-                    <label>Título do Aviso *</label>
-                    <input type="text" id="aviso-titulo" required placeholder="Ex: Atualização de Protocolo">
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Mensagem *</label>
+                    <textarea id="aviso-content" oninput="validateAviso()" rows="4" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500/40" placeholder="Descreva os detalhes..."></textarea>
                 </div>
-                <div class="form-group">
-                    <label>Mensagem *</label>
-                    <textarea id="aviso-mensagem" rows="4" required placeholder="Escreva os detalhes aqui..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Nível de Prioridade</label>
-                    <select id="aviso-prioridade">
-                        <option value="info">Informativo (Normal)</option>
-                        <option value="urgente">Urgente (Alta Prioridade)</option>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Prioridade</label>
+                    <select id="aviso-type" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500/40">
+                        <option value="normal">Normal</option>
+                        <option value="urgente">Urgente</option>
                     </select>
                 </div>
-                <button type="submit" class="btn-action" style="width: 100%; margin-top: 10px;">
-                    <i class="fa-solid fa-paper-plane"></i> Publicar no Mural
+                <button id="btn-pub-aviso" disabled onclick="handleAddAviso()" class="w-full px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium transition-colors">
+                    Publicar
                 </button>
-            </form>
-        </div>
-    </div>
-
-    <div class="modal" id="modal-mudar-cargo">
-        <div class="modal-body" style="max-width: 520px;">
-            <div class="modal-close" onclick="cancelarMudancaCargo()"></div>
-            <h2 style="margin-bottom: 10px; font-size: 1.3rem;">Confirmar Mudança de Cargo</h2>
-            <p style="font-size: 0.92rem; margin-bottom: 20px;">
-                Você está prestes a alterar o cargo do colaborador <strong id="cargo-confirm-nome"></strong>.
-            </p>
-
-            <div class="aviso-laranja" style="margin-bottom: 22px;">
-                <strong>Cargo Atual:</strong> <span id="cargo-confirm-atual"></span><br>
-                <strong>Novo Cargo:</strong> <span id="cargo-confirm-novo"></span>
-            </div>
-
-            <div class="step-actions" style="margin-top: 0;">
-                <button type="button" class="btn-action btn-secondary" onclick="cancelarMudancaCargo()">Cancelar</button>
-                <button type="button" class="btn-action" onclick="confirmarMudancaCargo()">Confirmar Alteração</button>
             </div>
         </div>
     </div>
 
-    <div class="modal" id="modal-demitir-funcionario">
-        <div class="modal-body" style="max-width: 640px;">
-            <div class="modal-close" onclick="cancelarDemissao()"></div>
-            <h2 style="margin-bottom: 8px; font-size: 1.3rem;">Ficha para Demissão</h2>
-            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;" id="demissao-subtitulo">
-                Etapa 1: Informações do Médico
-            </p>
+    <!-- MODAL: BUILDER RH -->
+    <div id="modal-builder" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md hidden transition-opacity">
+        <div class="w-full max-w-2xl overflow-hidden rounded-2xl shadow-2xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl border border-slate-200 dark:border-slate-700 slide-in-bottom relative">
+            <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700/50 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-slate-100 text-slate-600 dark:bg-slate-900/50 dark:text-slate-300 rounded-lg">
+                        <i data-lucide="settings-2" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-lg">Configurar Vaga</h3>
+                        <p class="text-xs opacity-60">Gestão de perguntas do formulário (modelo de testes).</p>
+                    </div>
+                </div>
+                <button onclick="toggleModal('modal-builder')" class="p-2 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-700/60 transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
 
-            <div id="demissao-etapa-1" class="form-step active">
-                <div class="employee-sheet">
-                    <div class="employee-sheet-item">
-                        <strong>Nome Completo</strong>
-                        <span id="demissao-nome"></span>
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="text-sm font-semibold mb-3">Perguntas Ativas</h4>
+                    <div id="builder-fields-list" class="space-y-2"></div>
+                </div>
+                <div class="p-4 rounded-xl border bg-slate-100 border-slate-200 dark:bg-slate-900/80 dark:border-slate-700">
+                    <h4 class="text-sm font-semibold mb-3">Nova Pergunta</h4>
+                    <div class="space-y-3">
+                        <input type="text" id="new-field-label" placeholder="Ex: Qual a sua especialidade?" oninput="validateNewField()" class="w-full p-2 text-sm rounded-lg border outline-none bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 text-slate-800 dark:text-white" />
+                        <div class="flex gap-2">
+                            <select id="new-field-type" class="flex-1 p-2 text-sm rounded-lg border outline-none bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 text-slate-800 dark:text-white">
+                                <option value="text">Resposta Livre (Texto)</option>
+                                <option value="select">Sim / Não</option>
+                            </select>
+                            <button id="btn-add-field" disabled onclick="handleAddCustomField()" class="px-4 bg-slate-800 text-white hover:opacity-90 disabled:opacity-50 dark:bg-slate-200 dark:text-slate-900 rounded-lg text-sm font-medium">Adicionar</button>
+                        </div>
                     </div>
-                    <div class="employee-sheet-item">
-                        <strong>ID</strong>
-                        <span id="demissao-id"></span>
-                    </div>
-                    <div class="employee-sheet-item">
-                        <strong>Telefone</strong>
-                        <span id="demissao-telefone"></span>
-                    </div>
-                    <div class="employee-sheet-item">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
