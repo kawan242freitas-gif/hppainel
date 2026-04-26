@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="pt-PT" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Hospitalar macOS</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {}
+            }
+        }
+    </script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Animações nativas para replicar os efeitos do React */
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        .slide-in-bottom { animation: slideInBottom 0.5s ease-out forwards; }
+        .slide-in-right { animation: slideInRight 0.5s ease-out forwards; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideInBottom { from { transform: translateY(1rem); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideInRight { from { transform: translateX(1rem); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        /* Ocultar barra de rolagem mas permitir rolagem */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="transition-colors duration-500">
+
+    <!-- Wrapper Principal (Fundo e Tema) -->
+    <div id="app-wrapper" class="min-h-screen w-full flex items-center justify-center bg-cover bg-center transition-all duration-500 bg-slate-100 dark:bg-slate-950"
+         style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');">
+        
+        <!-- Janela Ecrã Inteiro -->
+        <div class="w-full h-screen flex flex-col overflow-hidden backdrop-blur-xl transition-all duration-300 bg-white/80 dark:bg-slate-900/80 text-slate-800 dark:text-slate-100">
+            
+            <!-- Barra de Título (macOS Traffic Lights) -->
+            <div class="h-12 flex items-center justify-between px-4 select-none border-b border-slate-200/50 bg-white/30 dark:border-slate-700/50 dark:bg-slate-800/30">
+                <div class="flex gap-2">
+                    <div class="w-3.5 h-3.5 rounded-full bg-red-500 border border-red-600/50 cursor-pointer hover:opacity-80"></div>
+                    <div class="w-3.5 h-3.5 rounded-full bg-yellow-500 border border-yellow-600/50 cursor-pointer hover:opacity-80"></div>
+                    <div class="w-3.5 h-3.5 rounded-full bg-green-500 border border-green-600/50 cursor-pointer hover:opacity-80"></div>
+                </div>
+                <div id="window-title" class="text-xs font-semibold tracking-wide opacity-50 flex-1 text-center">
+                    HOSPITAL SYSTEM OS // VISÃO GERAL
+                </div>
+                <button onclick="toggleTheme()" class="p-1.5 rounded-md hover:bg-slate-500/20 transition-colors">
+                    <i id="theme-icon" data-lucide="moon" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Corpo (Sidebar + Content) -->
+            <div class="flex flex-1 overflow-hidden">
+                
+                <!-- Sidebar Inteligente -->
+                <div class="w-20 sm:w-64 flex flex-col border-r border-slate-200/50 bg-white/40 dark:border-slate-700/50 dark:bg-slate-900/50">
+                    <div class="p-4 sm:p-6 pb-2">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/30 mb-2">
+                            H
+                        </div>
+                        <h1 class="font-bold text-lg hidden sm:block tracking-tight">MedPanel Pro</h1>
+                    </div>
+
+                    <nav class="flex-1 px-3 py-4 flex flex-col gap-1 overflow-y-auto no-scrollbar" id="nav-menu">
+                        <!-- Gerado por JS -->
+                    </nav>
+
+                    <!-- Perfil Fixo no Rodapé -->
+                    <div class="p-4 border-t border-slate-200/50 bg-white/80 dark:border-slate-700/50 dark:bg-slate-900/80">
+                        <div class="flex items-center gap-3">
+                            <div class="relative">
+                                <i data-lucide="user-circle" class="w-9 h-9 text-slate-400"></i>
+                                <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
+                            </div>
+                            <div class="hidden sm:block flex-1 min-w-0">
+                                <p class="text-sm font-semibold truncate">Dr. Cortez</p>
+                                <p class="text-xs text-green-600 dark:text-green-400 font-medium">Disponível</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Área de Conteúdo Principal -->
+                <div class="flex-1 overflow-y-auto p-6 sm:p-10 relative scroll-smooth no-scrollbar">
+                    
+                    <!-- TAB: HOME -->
+                    <div id="tab-home" class="tab-content fade-in slide-in-bottom">
+                        <div class="mb-8">
+                            <h2 class="text-3xl font-light mb-2">Bom dia, Dr. Cortez</h2>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Aqui está o resumo da sua unidade hospitalar hoje.</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="p-6 rounded-2xl shadow-sm border backdrop-blur-md bg-white/60 border-white/40 dark:bg-slate-800/50 dark:border-slate-700/50">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="p-3 rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400">
+                                        <i data-lucide="activity"></i>
+                                    </div>
+                                    <span class="text-xs font-semibold px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">+12%</span>
+                                </div>
+                                <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Pacientes Internados</h3>
+                                <p class="text-3xl font-semibold mt-1">142</p>
+                            </div>
+                            <div class="p-6 rounded-2xl shadow-sm border backdrop-blur-md bg-white/60 border-white/40 dark:bg-slate-800/50 dark:border-slate-700/50">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="p-3 rounded-xl bg-purple-100 text-purple-600 dark:bg-purple-900/50 dark:text-purple-400">
+                                        <i data-lucide="briefcase"></i>
+                                    </div>
+                                    <span class="text-xs font-semibold px-2 py-1 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Em curso</span>
+                                </div>
+                                <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Processos de RH Ativos</h3>
+                                <p class="text-3xl font-semibold mt-1">4</p>
+                            </div>
+                            <div class="p-6 rounded-2xl shadow-sm border backdrop-blur-md bg-white/60 border-white/40 dark:bg-slate-800/50 dark:border-slate-700/50">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="p-3 rounded-xl bg-rose-100 text-rose-600 dark:bg-rose-900/50 dark:text-rose-400">
+                                        <i data-lucide="heart-pulse"></i>
+                                    </div>
+                                    <span class="text-xs font-semibold px-2 py-1 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">Crítico</span>
+                                </div>
+                                <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Taxa Ocupação UTI</h3>
+                                <p class="text-3xl font-semibold mt-1">94%</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: AVISOS -->
+                    <div id="tab-avisos" class="tab-content hidden h-full flex flex-col fade-in slide-in-bottom">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-semibold">Mural de Avisos</h2>
+                            <button onclick="toggleModal('modal-aviso')" class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm">
+                                <i data-lucide="plus" class="w-4 h-4"></i> Novo Aviso
+                            </button>
+                        </div>
+                        <div id="avisos-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-max">
+                            <!-- JS Inject -->
+                        </div>
+                    </div>
+
+                    <!-- TAB: CONTRATAÇÃO (AGORA: RESPOSTAS DE CANDIDATOS) -->
+                    <div id="tab-contratacao" class="tab-content hidden max-w-4xl mx-auto h-full flex flex-col fade-in slide-in-bottom relative">
+                        <div class="flex justify-between items-end mb-8">
+                            <div>
+                                <h2 class="text-2xl font-semibold mb-1">Candidaturas (Respostas)</h2>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Gira as submissões ao formulário e aprove novos colaboradores.</p>
+                            </div>
+                            <button onclick="toggleModal('modal-builder')" class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors border border-slate-300 hover:bg-slate-100 text-slate-600 dark:border-slate-600 dark:hover:bg-slate-800 dark:text-slate-300">
+                                <i data-lucide="settings-2" class="w-4 h-4"></i> Configurar Vaga
+                            </button>
+                        </div>
+
+                        <!-- Área de Conteúdo de Candidatos -->
+                        <div class="flex-1 overflow-hidden relative flex flex-col">
+                            
+                            <!-- Lista de Candidatos (Grid) -->
+                            <div id="candidates-list-view" class="flex-1 overflow-y-auto no-scrollbar rounded-2xl border backdrop-blur-md shadow-sm bg-white/60 border-slate-200 dark:bg-slate-800/40 dark:border-slate-700/50">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="text-sm uppercase tracking-wider bg-slate-50 text-slate-500 border-b border-slate-200 dark:bg-slate-900/50 dark:text-slate-400 dark:border-slate-700 sticky top-0 z-10">
+                                            <th class="p-4 font-semibold">Candidato</th>
+                                            <th class="p-4 font-semibold">Vaga/Departamento</th>
+                                            <th class="p-4 font-semibold text-center">Data</th>
+                                            <th class="p-4 font-semibold text-center">Status</th>
+                                            <th class="p-4 font-semibold text-right">Ação</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="candidates-tbody" class="divide-y divide-slate-200 dark:divide-slate-700/50">
+                                        <!-- JS Inject -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Vista de Detalhe do Candidato (Formulário Preenchido) -->
+                            <div id="candidate-detail-view" class="hidden absolute inset-0 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl flex flex-col overflow-hidden fade-in slide-in-right z-20">
+                                <div class="p-4 sm:p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                                    <div class="flex items-center gap-4">
+                                        <button onclick="closeCandidateView()" class="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors">
+                                            <i data-lucide="arrow-left" class="w-5 h-5 text-slate-600 dark:text-slate-300"></i>
+                                        </button>
+                                        <div>
+                                            <h3 id="detail-name" class="text-xl font-bold">Nome do Candidato</h3>
+                                            <p id="detail-role" class="text-sm text-slate-500 dark:text-slate-400">Vaga</p>
+                                        </div>
+                                    </div>
+                                    <div id="detail-status-badge"></div>
+                                </div>
+                                
+                                <div class="flex-1 overflow-y-auto p-4 sm:p-8 no-scrollbar bg-slate-50/30 dark:bg-slate-950/30">
+                                    <div class="max-w-2xl mx-auto">
+                                        <div class="mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">
+                                            <h4 class="text-xl font-semibold flex items-center gap-2">
+                                                <i data-lucide="file-text" class="w-5 h-5 text-blue-500"></i>
+                                                Formulário de Candidatura
+                                            </h4>
+                                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Respostas submetidas pelo candidato durante o processo de admissão.</p>
+                                        </div>
+                                        <div id="detail-answers" class="space-y-6">
+                                            <!-- JS Inject: Estilo Google Forms -->
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="detail-actions" class="p-4 sm:p-6 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                                    <!-- JS Inject Botões de Ação -->
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- TAB: EQUIPA -->
+                    <div id="tab-funcionarios" class="tab-content hidden h-full flex flex-col fade-in slide-in-bottom">
+                        <div class="mb-6 flex justify-between items-center">
+                            <div>
+                                <h2 class="text-2xl font-semibold mb-1">Gestão de Equipa</h2>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Administre cargos, status e quadros.</p>
+                            </div>
+                            <div id="equipa-total" class="px-4 py-2 rounded-lg text-sm font-medium border shadow-sm bg-white border-slate-200 text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300">
+                                Total: 0 ativos
+                            </div>
+                        </div>
+                        <div class="flex-1 rounded-xl border overflow-hidden backdrop-blur-md shadow-sm bg-white/60 border-slate-200 dark:bg-slate-800/40 dark:border-slate-700/50">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="text-sm uppercase tracking-wider bg-slate-50 text-slate-500 border-b border-slate-200 dark:bg-slate-900/50 dark:text-slate-400 dark:border-slate-700">
+                                            <th class="p-4 font-semibold">Colaborador</th>
+                                            <th class="p-4 font-semibold">Cargo (Hierarquia)</th>
+                                            <th class="p-4 font-semibold">Departamento</th>
+                                            <th class="p-4 font-semibold text-center">Status</th>
+                                            <th class="p-4 font-semibold text-right">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="funcionarios-tbody" class="divide-y divide-slate-200 dark:divide-slate-700/50">
+                                        <!-- JS Inject -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: RANKINGS -->
+                    <div id="tab-rankings" class="tab-content hidden h-full flex flex-col fade-in slide-in-bottom">
+                        <div class="text-center mb-8">
+                            <h2 class="text-3xl font-bold mb-2 bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Quadro de Excelência</h2>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Desempenho clínico e administrativo do mês.</p>
+                        </div>
+                        <div id="podium-container" class="flex justify-center items-end gap-2 sm:gap-6 mb-12 h-64 mt-4">
+                            <!-- JS Inject Pódio -->
+                        </div>
+                        <div id="rankings-list" class="rounded-xl border backdrop-blur-md overflow-hidden bg-white/60 border-slate-200 dark:bg-slate-800/40 dark:border-slate-700/50">
+                            <!-- JS Inject Lista Restante -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: NOVO AVISO (Reformulado) -->
+    <div id="modal-aviso" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md hidden transition-opacity">
+        <div class="w-full max-w-lg overflow-hidden rounded-2xl shadow-2xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl border border-slate-200 dark:border-slate-700 slide-in-bottom relative">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700/50 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400 rounded-lg">
+                        <i data-lucide="bell-plus" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold tracking-tight text-slate-800 dark:text-slate-100">Criar Novo Aviso</h3>
+                </div>
+                <button onclick="toggleModal('modal-aviso')" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 space-y-5">
+                <!-- Título -->
+                <div class="space-y-1.5">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Título do Aviso</label>
+                    <input type="text" id="aviso-title" placeholder="Ex: Reunião Geral de Equipa" oninput="validateAviso()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white dark:bg-slate-900/50 dark:text-white transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-sm"/>
+                </div>
+                
+                <!-- Prioridade -->
+                <div class="space-y-1.5">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Nível de Prioridade</label>
+                    <div class="relative">
+                        <select id="aviso-type" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white dark:bg-slate-900/50 dark:text-white transition-all shadow-sm appearance-none cursor-pointer">
+                            <option value="normal">🟢 Normal (Informativo)</option>
+                            <option value="urgente">🔴 Urgente (Ação Imediata)</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mensagem -->
+                <div class="space-y-1.5">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Conteúdo da Mensagem</label>
+                    <textarea id="aviso-content" rows="4" placeholder="Escreva os detalhes do aviso aqui..." oninput="validateAviso()" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none bg-white dark:bg-slate-900/50 dark:text-white transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-sm"></textarea>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-900/50 flex justify-end gap-3">
+                <button onclick="toggleModal('modal-aviso')" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                    Cancelar
+                </button>
+                <button id="btn-pub-aviso" disabled onclick="handleAddAviso()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:dark:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-medium transition-all shadow-md shadow-blue-500/20 flex items-center gap-2">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                    Publicar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CONSTRUTOR DE VAGA (RH) -->
+    <div id="modal-builder" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm hidden">
+        <div class="w-full max-w-lg p-6 rounded-2xl shadow-2xl flex flex-col max-h-[80vh] bg-white dark:bg-slate-800 dark:border dark:border-slate-700 slide-in-bottom">
+            <div class="flex justify-between items-center mb-5 border-b pb-3 border-slate-200 dark:border-slate-700">
+                <h3 class="text-lg font-semibold flex items-center gap-2"><i data-lucide="settings-2" class="w-5 h-5"></i> Construtor de Vaga</h3>
+                <button onclick="toggleModal('modal-builder')" class="p-1 rounded-full hover:bg-slate-500/20"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            
+            <div id="builder-fields-list" class="overflow-y-auto flex-1 pr-2 space-y-4 mb-4 no-scrollbar">
+                <!-- JS Inject -->
+            </div>
+
+            <div class="p-4 rounded-xl border bg-slate-100 border-slate-200 dark:bg-slate-900/80 dark:border-slate-700">
+                <h4 class="text-sm font-semibold mb-3">Nova Pergunta</h4>
+                <div class="space-y-3">
+                    <input type="text" id="new-field-label" placeholder="Ex: Qual a sua especialidade?" oninput="validateNewField()" class="w-full p-2 text-sm rounded-lg border outline-none bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 text-slate-800 dark:text-white" />
+                    <div class="flex gap-2">
+                        <select id="new-field-type" class="flex-1 p-2 text-sm rounded-lg border outline-none bg-white border-slate-300 dark:bg-slate-800 dark:border-slate-600 text-slate-800 dark:text-white">
+                            <option value="text">Resposta Livre (Texto)</option>
+                            <option value="select">Sim / Não</option>
+                        </select>
+                        <button id="btn-add-field" disabled onclick="handleAddCustomField()" class="px-4 bg-slate-800 text-white hover:opacity-90 disabled:opacity-50 dark:bg-slate-200 dark:text-slate-900 rounded-lg text-sm font-medium">Adicionar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LÓGICA JAVASCRIPT -->
+    <script>
+        // --- CONSTANTES E DADOS INICIAIS ---
+        const HIERARCHY = ['Estagiário(a)', 'Enfermeiro(a)', 'Médico(a) Residente', 'Médico(a) Especialista', 'Chefe de Serviço', 'Diretor Clínico'];
+        
+        let isDarkMode = false;
+        let activeTab = 'home';
+        
+        let avisos = [
+            { id: 1, title: 'Atualização Protocolo de Urgência', content: 'Revisão obrigatória do novo manual de triagem para todos os enfermeiros e médicos do turno da noite.', type: 'urgente', date: 'Hoje, 09:00' },
+            { id: 2, title: 'Manutenção Equipamentos', content: 'O Raio-X da sala 3 estará em manutenção programada durante a tarde de sexta-feira.', type: 'normal', date: 'Ontem, 14:30' }
+        ];
+        
+        let funcionarios = [
+            { id: 1, name: 'Marta Costa', role: 'Diretor Clínico', department: 'Administração', status: 'Em Serviço', score: 99 },
+            { id: 2, name: 'Ana Silva', role: 'Médico(a) Especialista', department: 'Cardiologia', status: 'Em Serviço', score: 95 },
+            { id: 3, name: 'Sofia Pires', role: 'Chefe de Serviço', department: 'Neurologia', status: 'Em Serviço', score: 92 },
+            { id: 4, name: 'João Santos', role: 'Enfermeiro(a)', department: 'Urgência', status: 'Ausente', score: 88 },
+            { id: 5, name: 'Pedro Gomes', role: 'Estagiário(a)', department: 'Pediatria', status: 'Em Serviço', score: 75 }
+        ];
+
+        let customFields = [
+            { id: 'q1', label: 'Qual a sua principal motivação para juntar-se à nossa equipa?', type: 'text' },
+            { id: 'q2', label: 'Possui certificação BLS/ACLS válida?', type: 'select', options: ['Sim', 'Não'] }
+        ];
+        
+        let candidates = [
+            { id: 101, name: 'Carlos Lima', role: 'Enfermeiro(a)', department: 'Urgência', date: 'Hoje', status: 'Pendente', answers: { q1: 'Procuro um ambiente dinâmico e focado no cuidado de excelência ao paciente.', q2: 'Sim' } },
+            { id: 102, name: 'Beatriz Sousa', role: 'Médico(a) Residente', department: 'Pediatria', date: 'Ontem', status: 'Pendente', answers: { q1: 'A reputação do vosso hospital na área da pediatria é incomparável.', q2: 'Sim' } },
+            { id: 103, name: 'Rui Mendes', role: 'Estagiário(a)', department: 'Triagem', date: '23/04/2026', status: 'Rejeitado', answers: { q1: 'Preciso de experiência inicial.', q2: 'Não' } }
+        ];
+
+        const NAV_ITEMS = [
+            { id: 'home', icon: 'home', label: 'Visão Geral' },
+            { id: 'avisos', icon: 'message-square', label: 'Mural de Avisos' },
+            { id: 'contratacao', icon: 'user-plus', label: 'Admissão (RH)' },
+            { id: 'funcionarios', icon: 'users', label: 'Equipa' },
+            { id: 'rankings', icon: 'trophy', label: 'Rankings' }
+        ];
+
+        // --- INICIALIZAÇÃO ---
+        window.onload = () => {
+            applyTestModelToCandidates();
+            renderNavMenu();
+            renderAvisos();
+            renderFuncionarios();
+            renderRankings();
+            renderBuilderFields();
+            renderCandidates();
+            applyThemeBackground();
+            lucide.createIcons();
+        };
+
+        // --- TEMA E NAVEGAÇÃO ---
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.documentElement.classList.toggle('dark', isDarkMode);
+            document.getElementById('theme-icon').setAttribute('data-lucide', isDarkMode ? 'sun' : 'moon');
+            applyThemeBackground();
+            lucide.createIcons();
+        }
+
+        function applyThemeBackground() {
+            const wrapper = document.getElementById('app-wrapper');
+            wrapper.style.backgroundBlendMode = isDarkMode ? 'overlay' : 'normal';
+            wrapper.style.backgroundColor = isDarkMode ? 'rgba(15,23,42,0.9)' : 'rgba(255,255,255,0.7)';
+        }
+
+        function renderNavMenu() {
+            const menu = document.getElementById('nav-menu');
+            menu.innerHTML = NAV_ITEMS.map(tab => `
+                <button onclick="setActiveTab('${tab.id}')" id="nav-${tab.id}" class="flex items-center gap-3 px-3 sm:px-4 py-3 rounded-xl transition-all duration-200 text-left w-full relative ${activeTab === tab.id ? 'bg-blue-50 text-blue-700 font-medium dark:bg-blue-600/20 dark:text-blue-400' : 'hover:bg-slate-500/10 opacity-70 hover:opacity-100'}">
+                    <i data-lucide="${tab.icon}" class="w-5 h-5 ${activeTab !== tab.id ? 'scale-95' : ''}"></i>
+                    <span class="hidden sm:block">${tab.label}</span>
+                    ${activeTab === tab.id ? '<div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1/2 bg-blue-500 rounded-r-full"></div>' : ''}
+                </button>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function setActiveTab(tabId) {
+            activeTab = tabId;
+            NAV_ITEMS.forEach(t => {
+                document.getElementById(`tab-${t.id}`).classList.add('hidden');
+            });
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            document.getElementById('window-title').innerText = `HOSPITAL SYSTEM OS // ${tabId.toUpperCase()}`;
+            renderNavMenu();
+        }
+
+        function toggleModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.toggle('hidden');
+            if (modalId === 'modal-aviso' && !modal.classList.contains('hidden')) {
+                document.getElementById('aviso-title').value = '';
+                document.getElementById('aviso-content').value = '';
+                validateAviso();
+            }
+        }
+
+        // --- MURAL DE AVISOS ---
+        function renderAvisos() {
+            const grid = document.getElementById('avisos-grid');
+            grid.innerHTML = avisos.map(aviso => `
+                <div class="p-5 rounded-xl border backdrop-blur-sm relative overflow-hidden transition-all hover:shadow-md bg-white/80 border-slate-200 dark:bg-slate-800/60 dark:border-slate-700/50">
+                    <div class="absolute top-0 left-0 w-1 h-full ${aviso.type === 'urgente' ? 'bg-red-500' : 'bg-green-500'}"></div>
+                    <div class="flex justify-between items-start mb-2 pl-2">
+                        <h3 class="font-semibold text-lg flex items-center gap-2">
+                            ${aviso.type === 'urgente' ? '<i data-lucide="alert-circle" class="w-4 h-4 text-red-500"></i>' : ''}
+                            ${aviso.title}
+                        </h3>
+                        <span class="text-xs text-slate-500 dark:text-slate-400">${aviso.date}</span>
+                    </div>
+                    <p class="pl-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">${aviso.content}</p>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function validateAviso() {
+            const title = document.getElementById('aviso-title').value.trim();
+            const content = document.getElementById('aviso-content').value.trim();
+            document.getElementById('btn-pub-aviso').disabled = !(title && content);
+        }
+
+        function handleAddAviso() {
+            const title = document.getElementById('aviso-title').value;
+            const content = document.getElementById('aviso-content').value;
+            const type = document.getElementById('aviso-type').value;
+            
+            avisos.unshift({
+                id: Date.now(), title, content, type,
+                date: new Date().toLocaleTimeString('pt-PT', { hour: '2-digit', minute:'2-digit' })
+            });
+            renderAvisos();
+            toggleModal('modal-aviso');
+        }
+
+        // --- RH / CONTRATAÇÃO (PAINEL DE RESPOSTAS) ---
+        function getTestAnswerForField(candidate, field, index) {
+            if (field.type === 'select') {
+                return index % 2 === 0 ? 'Sim' : 'Não';
+            }
+            return `${candidate.name}: resposta de teste para "${field.label}". Tenho experiência clínica e disponibilidade para início imediato.`;
+        }
+
+        function applyTestModelToCandidates() {
+            candidates.forEach((candidate, index) => {
+                if (!candidate.answers || typeof candidate.answers !== 'object') {
+                    candidate.answers = {};
+                }
+                customFields.forEach(field => {
+                    if (!candidate.answers[field.id]) {
+                        candidate.answers[field.id] = getTestAnswerForField(candidate, field, index);
+                    }
+                });
+            });
+        }
+
+        function setCandidateViewMode(mode) {
+            const listView = document.getElementById('candidates-list-view');
+            const detailView = document.getElementById('candidate-detail-view');
+            if (!listView || !detailView) return;
+
+            if (mode === 'detail') {
+                listView.classList.add('hidden');
+                detailView.classList.remove('hidden');
+            } else {
+                detailView.classList.add('hidden');
+                listView.classList.remove('hidden');
+            }
+        }
+
+        function openCandidateFromButton(id, evt) {
+            if (evt && typeof evt.stopPropagation === 'function') {
+                evt.stopPropagation();
+            }
+            viewCandidate(id);
+        }
+
+        function renderCandidates() {
+            const tbody = document.getElementById('candidates-tbody');
+            if (candidates.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center opacity-50">Nenhuma candidatura recebida ainda.</td></tr>';
+            } else {
+                tbody.innerHTML = candidates.map(c => {
+                    let statusClass = c.status === 'Pendente' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400' :
+                                      c.status === 'Aprovado' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400' :
+                                      'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400';
+                    return `
+                        <tr class="transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-800/60">
+                            <td class="p-4 font-medium">${c.name}</td>
+                            <td class="p-4">
+                                <div class="text-sm font-medium">${c.role}</div>
+                                <div class="text-xs opacity-60">${c.department}</div>
+                            </td>
+                            <td class="p-4 text-center text-sm opacity-80">${c.date}</td>
+                            <td class="p-4 text-center">
+                                <span class="px-3 py-1 rounded-full text-xs font-semibold ${statusClass}">${c.status}</span>
+                            </td>
+                            <td class="p-4 text-right">
+                                <button onclick="openCandidateFromButton(${c.id}, event)" class="p-2 text-blue-500 hover:bg-blue-500/10 rounded-lg transition-colors" title="Ver Respostas">
+                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+            lucide.createIcons();
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function viewCandidate(id) {
+            try {
+                const c = candidates.find(cand => cand.id === id);
+                if (!c) {
+                    setCandidateViewMode('list');
+                    return;
+                }
+                applyTestModelToCandidates();
+
+                document.getElementById('detail-name').innerText = c.name;
+                document.getElementById('detail-role').innerText = `${c.role} • ${c.department}`;
+
+                let statusClass = c.status === 'Pendente' ? 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/40 dark:text-amber-400 dark:border-amber-800' :
+                                  c.status === 'Aprovado' ? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/40 dark:text-green-400 dark:border-green-800' :
+                                  'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-400 dark:border-red-800';
+                document.getElementById('detail-status-badge').innerHTML = `<span class="px-3 py-1 rounded-full border text-sm font-semibold ${statusClass}">${c.status}</span>`;
+
+                const answersHtml = customFields.map((f, i) => {
+                    const answer = c.answers && c.answers[f.id] ? escapeHtml(c.answers[f.id]) : '<span class="italic opacity-50">Candidato não respondeu</span>';
+                    return `
+                        <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col gap-3">
+                            <p class="text-sm font-semibold text-slate-800 dark:text-slate-200 flex items-start gap-2">
+                                <span class="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400 px-2 py-0.5 rounded text-xs mt-0.5 shrink-0">Pergunta ${i+1}</span>
+                                <span class="leading-relaxed">${escapeHtml(f.label)}</span>
+                            </p>
+                            <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                                <p class="text-slate-700 dark:text-slate-300 leading-relaxed">${answer}</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                document.getElementById('detail-answers').innerHTML = answersHtml || '<p class="opacity-50">Nenhuma pergunta configurada no construtor.</p>';
+
+                const actionsDiv = document.getElementById('detail-actions');
+                if (c.status === 'Pendente') {
+                    actionsDiv.innerHTML = `
+                        <button onclick="rejectCandidate(${c.id})" class="px-5 py-2.5 rounded-xl font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                            Recusar Candidato
+                        </button>
+                        <button onclick="approveCandidate(${c.id})" class="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-all shadow-md flex items-center gap-2">
+                            <i data-lucide="check-circle" class="w-4 h-4"></i>
+                            Aprovar & Admitir
+                        </button>
+                    `;
+                } else {
+                    actionsDiv.innerHTML = `<p class="text-sm opacity-60 italic py-2">Processo de avaliação concluído.</p>`;
+                }
+
+                setCandidateViewMode('detail');
+                lucide.createIcons();
+            } catch (error) {
+                console.error('Erro ao abrir candidato:', error);
+                setCandidateViewMode('list');
+                const tbody = document.getElementById('candidates-tbody');
+                if (tbody) {
+                    tbody.insertAdjacentHTML('afterbegin', '<tr><td colspan="5" class="p-3 text-center text-xs text-red-500">Erro ao abrir detalhes do candidato. Tente novamente.</td></tr>');
+                }
+            }
+        }
+
+        function closeCandidateView() {
+            setCandidateViewMode('list');
+        }
+
+        function approveCandidate(id) {
+            // ALERTA DE CONFIRMAÇÃO ADICIONADO
+            if (!confirm('Tem a certeza que deseja aprovar e admitir este candidato? Esta ação irá adicioná-lo à sua equipa.')) {
+                return;
+            }
+
+            const c = candidates.find(cand => cand.id === id);
+            if(c) {
+                c.status = 'Aprovado';
+                // Admitir à equipa
+                funcionarios.push({
+                    id: Date.now(),
+                    name: c.name,
+                    role: c.role,
+                    department: c.department,
+                    status: 'Em Serviço',
+                    score: 50 // Pontuação base
+                });
+                renderCandidates();
+                renderFuncionarios();
+                renderRankings();
+                viewCandidate(id); // Atualiza a vista atual para "Aprovado"
+            }
+        }
+
+        function rejectCandidate(id) {
+            // ALERTA DE CONFIRMAÇÃO ADICIONADO
+            if (!confirm('Tem a certeza que deseja recusar esta candidatura? Esta ação é irreversível.')) {
+                return;
+            }
+
+            const c = candidates.find(cand => cand.id === id);
+            if(c) {
+                c.status = 'Rejeitado';
+                renderCandidates();
+                viewCandidate(id); // Atualiza a vista atual para "Rejeitado"
+            }
+        }
+
+        // Builder RH (Modal Configurar Vaga)
+        function renderBuilderFields() {
+            const list = document.getElementById('builder-fields-list');
+            if(customFields.length === 0) {
+                list.innerHTML = '<p class="text-center text-sm opacity-50 py-4">Nenhuma pergunta configurada.</p>';
+            } else {
+                list.innerHTML = customFields.map((f, i) => `
+                    <div class="p-3 rounded-lg border flex items-center justify-between bg-slate-50 border-slate-200 dark:bg-slate-900/50 dark:border-slate-700">
+                        <div>
+                            <span class="text-xs font-bold opacity-50 mr-2">#${i+1}</span>
+                            <span class="font-medium text-sm">${f.label}</span>
+                            <span class="ml-2 text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">${f.type === 'text' ? 'Texto' : 'Opção'}</span>
+                        </div>
+                        <button onclick="handleRemoveCustomField('${f.id}')" class="text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 p-1.5 rounded-md transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </div>
+                `).join('');
+            }
+            lucide.createIcons();
+        }
+
+        function validateNewField() {
+            const val = document.getElementById('new-field-label').value.trim();
+            document.getElementById('btn-add-field').disabled = !val;
+        }
+
+        function handleAddCustomField() {
+            const label = document.getElementById('new-field-label').value;
+            const type = document.getElementById('new-field-type').value;
+            customFields.push({ id: 'q'+Date.now(), label, type, options: type === 'select' ? ['Sim', 'Não'] : [] });
+            applyTestModelToCandidates();
+            document.getElementById('new-field-label').value = '';
+            validateNewField();
+            renderBuilderFields();
+        }
+
+        function handleRemoveCustomField(id) {
+            customFields = customFields.filter(f => f.id !== id);
+            renderBuilderFields();
+        }
+
+        // --- EQUIPA ---
+        function renderFuncionarios() {
+            document.getElementById('equipa-total').innerText = `Total: ${funcionarios.length} ativos`;
+            const tbody = document.getElementById('funcionarios-tbody');
+            if(funcionarios.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center opacity-50">Nenhum funcionário na base de dados.</td></tr>';
+            } else {
+                tbody.innerHTML = funcionarios.map(f => {
+                    const isTopRole = f.role === HIERARCHY[HIERARCHY.length-1];
+                    const isBotRole = f.role === HIERARCHY[0];
+                    const statusClass = f.status === 'Em Serviço' 
+                        ? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/40 dark:text-green-400 dark:border-green-800'
+                        : 'bg-slate-200 text-slate-600 border-slate-300 dark:bg-slate-700 dark:text-slate-400 dark:border-slate-600';
+                    const dotClass = f.status === 'Em Serviço' ? 'bg-green-500 animate-pulse' : 'bg-slate-400';
+                    const initials = f.name.split(' ').map(n=>n[0]).join('').substring(0,2);
+
+                    return `
+                        <tr class="transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-800/60">
+                            <td class="p-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                                        ${initials}
+                                    </div>
+                                    <span class="font-medium">${f.name}</span>
+                                </div>
+                            </td>
+                            <td class="p-4">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm">${f.role}</span>
+                                    <div class="flex flex-col">
+                                        <button onclick="changeRole(${f.id}, 'up')" ${isTopRole?'disabled':''} class="text-slate-400 hover:text-green-500 disabled:opacity-20"><i data-lucide="chevron-up" class="w-3.5 h-3.5"></i></button>
+                                        <button onclick="changeRole(${f.id}, 'down')" ${isBotRole?'disabled':''} class="text-slate-400 hover:text-red-500 disabled:opacity-20"><i data-lucide="chevron-down" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-4 text-sm opacity-80">${f.department}</td>
+                            <td class="p-4 text-center">
+                                <button onclick="toggleStatus(${f.id})" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all hover:scale-105 border ${statusClass}">
+                                    <span class="w-1.5 h-1.5 rounded-full mr-1.5 ${dotClass}"></span>${f.status}
+                                </button>
+                            </td>
+                            <td class="p-4 text-right">
+                                <button onclick="fireEmployee(${f.id})" class="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors" title="Demitir">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+            lucide.createIcons();
+        }
+
+        function toggleStatus(id) {
+            const emp = funcionarios.find(f => f.id === id);
+            if(emp) emp.status = emp.status === 'Em Serviço' ? 'Ausente' : 'Em Serviço';
+            renderFuncionarios();
+        }
+
+        function changeRole(id, direction) {
+            const emp = funcionarios.find(f => f.id === id);
+            if(emp) {
+                let idx = HIERARCHY.indexOf(emp.role);
+                if(direction === 'up' && idx < HIERARCHY.length-1) idx++;
+                if(direction === 'down' && idx > 0) idx--;
+                emp.role = HIERARCHY[idx];
+                renderFuncionarios();
+                renderRankings();
+            }
+        }
+
+        function fireEmployee(id) {
+            if(confirm('Tem a certeza que deseja remover este funcionário dos quadros?')) {
+                funcionarios = funcionarios.filter(f => f.id !== id);
+                renderFuncionarios();
+                renderRankings();
+            }
+        }
+
+        // --- RANKINGS ---
+        function renderRankings() {
+            const sorted = [...funcionarios].sort((a, b) => b.score - a.score);
+            const top3 = sorted.slice(0, 3);
+            const rest = sorted.slice(3);
+
+            const podiumContainer = document.getElementById('podium-container');
+            if(top3.length > 0) {
+                // Order: Prata(1), Ouro(0), Bronze(2)
+                const order = top3.length === 3 ? [top3[1], top3[0], top3[2]] : top3;
+                
+                podiumContainer.innerHTML = order.map(f => {
+                    const idx = top3.indexOf(f);
+                    const isGold = idx === 0; const isSilver = idx === 1; const isBronze = idx === 2;
+                    const height = isGold ? 'h-48' : isSilver ? 'h-36' : 'h-28';
+                    const colors = isGold ? 'bg-gradient-to-t from-yellow-500/20 to-yellow-300/50 border-yellow-400 text-yellow-600 dark:text-yellow-400 shadow-[0_0_30px_rgba(234,179,8,0.3)] z-10'
+                                 : isSilver ? 'bg-gradient-to-t from-slate-400/20 to-slate-300/50 border-slate-300 text-slate-500 dark:text-slate-300'
+                                 : 'bg-gradient-to-t from-orange-600/20 to-orange-400/50 border-orange-400 text-orange-600 dark:text-orange-400';
+                    const scoreColor = isGold ? 'text-yellow-500' : isSilver ? 'text-slate-400' : 'text-orange-500';
+
+                    return `
+                        <div class="flex flex-col items-center group">
+                            <div class="relative flex flex-col items-center mb-4 p-3 rounded-xl border backdrop-blur-md transition-transform group-hover:-translate-y-2 bg-white/90 dark:bg-slate-800/80 shadow-lg">
+                                ${isGold ? '<div class="absolute -top-6 text-yellow-500 animate-bounce"><i data-lucide="medal" class="w-8 h-8"></i></div>' : ''}
+                                <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-lg mb-2 overflow-hidden border-2 border-transparent">
+                                    ${f.name.charAt(0)}
+                                </div>
+                                <span class="font-bold text-sm sm:text-base text-center w-20 sm:w-28 truncate">${f.name}</span>
+                                <span class="text-xs opacity-70 truncate w-full text-center">${f.role}</span>
+                                <span class="mt-2 font-black text-lg ${scoreColor}">${f.score} pts</span>
+                            </div>
+                            <div class="w-24 sm:w-32 rounded-t-lg border-t-4 border-l border-r backdrop-blur-sm ${height} ${colors} flex items-start justify-center pt-4">
+                                <span class="font-black text-4xl opacity-50">${idx + 1}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                podiumContainer.innerHTML = '';
+            }
+
+            const listContainer = document.getElementById('rankings-list');
+            if(rest.length > 0) {
+                listContainer.innerHTML = rest.map((f, i) => `
+                    <div class="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-700/50 last:border-0 hover:bg-slate-500/5 transition-colors">
+                        <div class="flex items-center gap-4">
+                            <span class="w-6 text-center font-bold opacity-40">${i + 4}º</span>
+                            <div>
+                                <p class="font-semibold">${f.name}</p>
+                                <p class="text-xs opacity-60">${f.department}</p>
+                            </div>
+                        </div>
+                        <div class="font-bold font-mono bg-slate-500/10 px-3 py-1 rounded-lg">
+                            ${f.score} pts
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                listContainer.innerHTML = '';
+            }
+            lucide.createIcons();
+        }
+
+    </script>
+</body>
+</html>
